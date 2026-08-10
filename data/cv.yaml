@@ -1,0 +1,44 @@
+person:
+  name:
+    given: "Scott"
+    family: "Love"
+    full: "Scott Love"
+  title: ""
+  email: ""
+  website: ""
+  orcid: ""
+  location: ""
+  summary: ""
+
+cv:
+  language: "en"
+  style: "moderncv"
+  theme:
+    style: "casual"
+    color: "blue"
+  generated_from: "overleaf_seed"
+
+sections:
+  education: []
+  positions: []
+  publications: []
+  teaching: []
+  grants: []
+  awards: []
+  service: []
+  talks: []
+  supervision: []
+  skills: []
+  languages: []
+  memberships: []
+  other: []
+
+publications:
+  sync_sources:
+    orcid: true
+    hal: true
+    openalex: true
+    crossref: true
+    pubmed: false
+    scholar: false
+  manual_overrides: []
