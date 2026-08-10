@@ -141,8 +141,6 @@ def print_summary(data: dict, output: Path) -> None:
     print(f"  Book chapters           : {chapter_n}")
     print(f"  Under review / in prep  : {review_n}")
     print(f"  Conference presentations : {conf_n}")
-    total_pubs = journal_n + chapter_n + review_n
-    print(f"  Total publications      : {total_pubs}")
     print("=" * 60)
     print()
     print("To compile to PDF (requires a LaTeX distribution):")
