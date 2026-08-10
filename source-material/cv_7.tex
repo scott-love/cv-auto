@@ -1,0 +1,295 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% "ModernCV" CV and Cover Letter
+% LaTeX Template
+% Version 1.2 (25/3/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Xavier Danaux (xdanaux@gmail.com) with modifications by:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+% Important note:
+% This template requires the moderncv.cls and .sty files to be in the same 
+% directory as this .tex file. These files provide the resume style and themes 
+% used for structuring the document.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt,a4paper,sans]{moderncv} % Font sizes: 10, 11, or 12; paper sizes: a4paper, letterpaper, a5paper, legalpaper, executivepaper or landscape; font families: sans or roman
+
+\moderncvstyle{casual} % CV theme - options include: 'casual' (default), 'classic', 'oldstyle' and 'banking'
+\moderncvcolor{blue} % CV color - options include: 'blue' (default), 'orange', 'green', 'red', 'purple', 'grey' and 'black'
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[scale=.84]{geometry} % Reduce document margins
+\setlength{\hintscolumnwidth}{2.5cm} % Uncomment to change the width of the dates column
+%\setlength{\makecvtitlenamewidth}{10cm} % For the 'classic' style, uncomment to adjust the width of the space allocated to your name
+
+%----------------------------------------------------------------------------------------
+%	NAME AND CONTACT INFORMATION SECTION
+%----------------------------------------------------------------------------------------
+
+\firstname{Scott} % Your first name
+\familyname{Love, PhD} % Your last name
+
+% All information in this block is optional, comment out any lines you don't need
+\title{1 May 198X, UK Citizen}
+%\address{15 Allée des Glaïeuls}{Montlouis sur Loire 37270, France}
+%\mobile{+33 7 63 40 06 59}
+%\phone{(000) 111 1112}
+\email{love.a.scott@gmail.com}
+%\homepage{staff.org.edu/~jsmith}{staff.org.edu/$\sim$jsmith} % The first argument is the url for the clickable link, the second argument is the url displayed in the template - this allows special characters to be displayed such as the tilde in this example
+%\extrainfo{ORCID: orcid.org/0000-0001-7416-9210}
+\photo[70pt][0.4pt]{pictures/scott} % The first bracket is the picture height, the second is the thickness of the frame around the picture (0pt for no frame)
+%\quote{"A witty and playful quotation" - John Smith}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	COVER LETTER
+%----------------------------------------------------------------------------------------
+
+% To remove the cover letter, comment out this entire block
+
+%\clearpage
+
+%\recipient{HR Department}{Corporation\\123 Pleasant Lane\\12345 City, State} % Letter %recipient
+%\date{\today} % Letter date
+%\opening{Dear Sir or Madam,} % Opening greeting
+%\closing{Sincerely yours,} % Closing phrase
+%\enclosure[Attached]{curriculum vit\ae{}} % List of enclosed documents
+
+%\makelettertitle % Print letter title
+
+%\lipsum[1-3] % Dummy text
+
+%\makeletterclosing % Print letter signature
+
+%\newpage
+
+%----------------------------------------------------------------------------------------
+%	CURRICULUM VITAE
+%----------------------------------------------------------------------------------------
+
+\makecvtitle % Print the CV title
+
+%----------------------------------------------------------------------------------------
+%	EDUCATION SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Education}
+\subsection{The University of Glasgow, UK}
+
+
+\cventry{2007 -- 2011}{Ph.D. Psychology}{}{}{}{}  % Arguments not required can be left empty
+\cvitem{Title}{\emph{An fMRI and psychophysical investigation of the temporal factor of audiovisual integration}}
+\cvitem{Supervisor}{Professor Frank Pollick}
+\cvitem{Description}{Functional Magnetic Resonance Imaging and behavioral experiments clearly showed that in humans audiovisual synchrony judgments and temporal order judgments index different perceptual processes supported by divergent neural mechanisms.}
+
+\cventry{2006 -- 2007}{M.Sc. Research Methods of Psychological Science}{}{}{}{Awarded with Distinction}
+\cvitem{Title}{\emph{How audio and visual cues interact to discriminate tempo of swing groove drumming}}
+\cvitem{Supervisor}{Professor Frank Pollick}
+
+\cventry{2002 -- 2006}{MA Social Sciences: Psychology \& Philosophy}{}{}{}{First Class Honours}
+
+%----------------------------------------------------------------------------------------
+%	WORK EXPERIENCE SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Professional Experience}
+\subsection{Research}
+\cventry{Nov. 2017 -- present}{Chargé de Recherche}{UMR Physiologie de la Reproduction et des Comportements, INRA}{France}{}{}
+\cvitem{Team}{Comportement, Neurobiologie, Adaptation}
+%\cvitem{Project}{Neuroimaging in farm animals}
+
+\cventry{Nov. 2015 -- Aug. 2017}{Research Engineer}{Université François-Rabelais de Tours, Inserm, Imagerie et Cerveau UMR U930}{France}{}{}
+\cvitem{Supervisor}{Professor Christophe Destrieux}
+%\cvitem{Project}{Neuroimaging of the sheep brain:
+%\begin{itemize}
+%\item Create a surface-based neuroanatomical labeling of the %sheep cortex.
+%\item Create age-specific sheep brain MRI and CT templates.
+%\item Investigate seasonal changes in pituitary and pineal gland %structure using MRI. 
+%\end{itemize}}
+
+\cventry{Apr. 2015 -- Oct. 2015}{Researcher}{Laboratoire de Psychologie Cognitive UMR7290, Aix-Marseille Université / CNRS}{France}{}{}
+\cvitem{Supervisor}{Adrien Meguerditchian, Comparative Cognition team}
+%\cvitem{Project}{Neuroimaging of the baboon brain:
+%\begin{itemize}
+%\item Acquire MRI data for a large population of baboons.
+%\item Create MRI templates and tissue probability maps for the %baboon brain.
+%\item Investigate structural asymmetries of the baboon brain and %their correlation with behavioral measures.
+%\end{itemize}}
+
+\cventry{2013 -- 2015}{Researcher}{Institut de Neurosciences de la Timone UMR7289, Aix-Marseille Université / CNRS}{France}{}{}
+\cvitem{Supervisor}{Professor Pascal Belin, Neural Basis of Communication Lab}
+%\cvitem{Projects}{Elucidate the neural mechanisms of voice perception:
+%\begin{itemize}
+%\item Use whole-hemisphere intracranial electroencephalography %to search for norm-based coding of voices in the macaque monkey.
+%\item Use fMRI to search for voice selective regions in the %anesthetized baboon brain.
+%\item Use fMRI to investigate the selective properties of human %Temporal Voice Areas. 
+%\end{itemize}}
+
+\cventry{2011 -- 2013}{Post-doctoral Fellow}{Indiana University, Bloomington}{USA}{}{}
+\cvitem{Supervisor}{Professor Aina Puce, IU Social Neuroscience Lab}
+%\cvitem{Projects}{Use fMRI and EEG to investigate:
+%\begin{itemize}
+%\item Neural mechanisms of eye gaze perception.
+%\item How neural markers of face perception are modulated by %number of faces.
+%\item Human infant (\textasciitilde4 months) voice perception.
+%\end{itemize}}
+
+\subsection{Teaching}
+\cventry{2013}{P335 Cognitive Psychology}{Indiana University}{}{}{Lecturing to 200 students}
+\cventry{2007 -- 2010}{Level 1 Psychology tutoring}{University of Glasgow}{}{}{Groups of \textasciitilde15 students each year}
+%----------------------------------------------------------------------------------------
+%	AWARDS SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Honors \& Awards}
+
+\cvitem{2011}{Grindley Grant for Conference Attendance }
+\cvitem{2010}{Guarantors of Brain Travel Award}
+\cvitem{2009}{Attendance funding award, Socrates–Erasmus Intensive Program, “Formal Models and Quantitative Methods for Psychology”}
+\cvitem{2008}{Attendance funding award, Socrates–Erasmus Intensive Program, “Mathematical and Computational Models in the Psychological Sciences”}
+\cvitem{2008}{Attendance funding award, Workshop “Cue Combination - Unifying perceptual theory”}
+
+%----------------------------------------------------------------------------------------
+%	COMPUTER SKILLS SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Skills}
+
+\cvitem{f/MRI}{SPM, BrainVoyager QX, FSL, ANTs, ITK-SNAP, Brainvisa, Anatomist, Freesurfer}
+\cvitem{EEG}{EEGLAB, LIMOEEG, Net Station}
+\cvitem{Programming}{\textsc{MATLAB}, Psychtoolbox, Presentation, Bash, \textsc{python}, \LaTeX}
+\cvitem{Software}{SPSS, Excel, Word, PowerPoint, Canvas, Photoshop, Adobe Illustrator, Adobe Premier, Adobe Audition, Final Cut, FFmpeg}
+
+%----------------------------------------------------------------------------------------
+%	LANGUAGES SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Languages}
+
+\cvitemwithcomment{English}{Mothertongue}{}
+\cvitemwithcomment{French}{Elementary to Intermediate}{CEFRL scale}
+
+%----------------------------------------------------------------------------------------
+%	INTERESTS SECTION
+%----------------------------------------------------------------------------------------
+
+%\section{Interests}
+
+%\renewcommand{\listitemsymbol}{-~} % Changes the symbol used for lists
+
+%\cvlistdoubleitem{Piano}{Chess}
+%\cvlistdoubleitem{Cooking}{Dancing}
+%\cvlistitem{Running}
+
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	INTERESTS SECTION
+%----------------------------------------------------------------------------------------
+
+\section{Publications}
+\subsection{Peer-reviewed articles}
+
+\cvitem{}{\textbf{Love, S. A.,} Petrini, K., Pernet, C., Latinus, M., Pollick, F.E. 2018. Overlapping but Divergent Neural Correlates Underpinning Audiovisual Synchrony and Temporal Order Judgments \textit{Frontiers in Human Neuroscience 12:274}}
+
+\cvitem{IF = 2.3 (Q2)}{Fontaine, M., \textbf{Love, S.A.,} Latinus, M. 2017. Familiarity and voice representation: from acoustic-based representation to voice averages. \textit{Frontiers in Psychology}}
+
+\cvitem{IF = 8.3 (Q1)}{Marie, D., Roth, M., Lacoste, R., Nazarian, B., Bertello, A., Anton, J.-L., Hopkins, W.D., Margiotoudi, K., \textbf{Love, S.A.,} Meguerditchian, A., 2017. Left brain asymmetry of the planum temporale in a nonhominid primate: redefining the origin of brain specialization for language. \textit{Cerebral Cortex} }
+
+\cvitem{IF = 6.4 (Q1)}{\textbf{Love, S.A.,} Marie, D., Roth, M., Lacoste, R., Nazarian, B., Bertello, A., Coulon, O., Anton, J.-L., Meguerditchian, A., 2016. The average baboon brain: MRI templates and tissue probability maps from 89 individuals. \textit{Neuroimage 132,} 526–533}
+
+\cvitem{IF = 5.8 (Q1)}{Destrieux, C., Terrier, LM., Andersson, F., \textbf{Love, S.A.,} Cottier, JP., Duvernoy, H., Velut, S., Janot, K., Zemmoura, I. 2016. A practical guide for the identification of major sulcogyral structures of the human cortex. \textit{Brain Structure and Function}, 1–15}
+
+\cvitem{IF = 7.4 (Q1)}{Latinus, M., \textbf{Love, S.A.,} Rossi, A., Parada, F.J., Huang, L., Conty, L., George, N., James, K., Puce, A., 2015. Social decisions affect neural activity to perceived dynamic gaze. \textit{Social Cognitive and Affective Neuroscience 10(11),} 1557-1567}
+
+\cvitem{IF = 3.2 (Q2)}{McAleer, P., Pollick, F.E., \textbf{Love, S.A.,} Crabbe, F., Zacks, J.M., 2013. The role of kinematics in cortical regions for continuous human motion perception. \textit{Cognitive, affective \& behavioral neuroscience 14(1),} 307-318}
+
+\cvitem{IF = 3.5 (Q1)}{\textbf{Love, S.A.,} Petrini, K, Cheng, A, Pollick, F.E., 2013. A Psychophysical Investigation of Differences Between Synchrony and Temporal Order Judgments. \textit{PLoS ONE 8}}
+
+\cvitem{IF = 1.5 (Q3)}{Jola, C., McAleer, P., Grosbras, M.-H., \textbf{Love, S.A.,} Morison, G., Pollick, F.E., 2013. Uni- and multisensory brain areas are synchronised across spectators when watching unedited dance recordings. \textit{i-Perception 4}, 265–284}
+
+\cvitem{IF = 1.2 (Q4)}{\textbf{Love, S.A.,} Pollick, F.E., Latinus, M., 2011. Cerebral Correlates and Statistical Criteria of Cross-Modal Face and Voice Integration. \textit{Seeing and Perceiving 24,} 351–367}
+
+\cvitem{IF = 5.9 (Q1)}{Petrini, K., Pollick, F.E., Dahl, S., McAleer, P., McKay, L.S., McKay, L., Rocchesso, D., Waadeland, C.H., \textbf{Love, S.A.,} Avanzini, F., Puce, A., 2011. Action expertise reduces brain activity for audiovisual matching actions: an fMRI study with expert drummers. \textit{Neuroimage 56,} 1480–1492}
+
+\subsection{Book chapters}
+
+\cvitem{1}{Puce, A., Latinus, M., Rossi, A., DaSilva, E., Parada, F., \textbf{Love, S.A.,} Ashourvan, A., Jayaramen, S., 2015. Neural Basis for Social Attention in Healthy Humans, in: Puce, A., Bertenthal, B.I. (Eds.), \textit{The Many Faces of Social Attention: Behavioral and Neural Measures.} Springer New York, New York, NY}
+
+\cvitem{2}{Maurage, P., \textbf{Love, S.A.,} D’Hondt, F., 2013. Crossmodal Integration of Emotional Stimuli in Alcohol Dependence, in: Belin, P., Campanella, S., Ethofer, T. (Eds.), \textit{Integrating Face and Voice in Person Perception.} Springer New York, New York, NY}
+
+\cvitem{3}{McAleer, P., \textbf{Love, S. A.} 2013. Perceiving intention in animacy displays created from human motion. In M. D. Rutherford, \& V. A. Kuhlmeier (Eds.) \textit{Social Perception: Detection and Interpretation of Animacy, Agency, and Intention.} MIT Press}
+
+\cvitem{4}{\textbf{Love, S.A.,} Pollick, F.E., Petrini, K., 2012. Effects of Experience, Training and Expertise on Multisensory Perception: Investigating the Link between Brain and Behavior, in: Esposito, A., Esposito, A.M., Vinciarelli, A., Hoffmann, R., Müller, V. (Eds.), \textit{Cognitive Behavioural Systems, Lecture Notes in Computer Science.} Springer Berlin Heidelberg}
+
+\subsection{Under review or in preparation}
+
+\cvitem{1}{\textbf{Love, S.A.,} Ashourvan, A., Jayaraman, S., Puce, A. (under review). Faces in a crowd: N170 ERP amplitude is modulated by the number of concurrent stimulus items}
+
+\cvitem{2}{\textbf{Love, S.A.,} (in preparation). A surface-based neuroanatomical parcellation of the sheep cortex}
+
+\section{Conference Presentations}
+
+\cvitem{1}{\textbf{Love, S.A.,} Auge, M., Siwiaszczyk, M., Destrieux, C., Andersson, F., Chaillou, E., 2016. Surface-based cortical parcellation of the sheep brain. Poster at 2e Journée Thématique de Société des Neurosciences, Tour, May 24-25}
+
+\cvitem{2}{\textbf{Love, S.A.,} Marie, D., Roth, M., Lacoste, R., Nazarian, B., Bertello, A., Coulon, O., Anton, J.-L., Meguerditchian, A., 2016. The average baboon brain: MRI templates and tissue probability maps from 89 individuals. Poster at Human Brain Mapping Conference, Geneva, June 26-30}
+
+\cvitem{3}{Marie, D., Margiotoudi, K., Coulon, O., Roth, M., Lacoste, R., Nazarian, B., Bertello, A., Anton, JL., Hopkins, W.D., \textbf{Love, S.A.,} Meguerditchian, A., 2016. Brain asymmetries of two language-related area homologs in baboon structural MRI. Poster at Human Brain Mapping Conference, Geneva, June 26-30}
+
+\cvitem{4}{Marie, D., Margiotoudi, K., Coulon, O., Roth, M., Lacoste, R., Nazarian, B., Bertello, A., Anton, JL., Hopkins, W.D., \textbf{Love, S.A.,} Meguerditchian, A., 2016. Brain asymmetries of two language-related area homologs in baboon structural MRI. Poster at Human Brain Mapping Conference, Geneva, June 26-30}
+
+\cvitem{5}{Chaillou, E., Barantin, L., Andersson, F., Filipiak, I., Delaplace, R., Morisse, M., Sta, M., Haslin, E., \textbf{Love, S.A.,} Levy, F., Nowak, R., 2016. Impact of early rearing experience on brain development in sheep infant. Poster at Forum of Neuroscience, Copenhagen, July 2-6}
+
+\cvitem{6}{Puce, A., Latinus, M., \textbf{Love, S.A.,} Rossi, A., Parada, F., Huang, L., Conty, L., James, K., George, N, 2014. Neural activity to viewed dynamic gaze is affected by social decision. Front. Hum. Neurosci. Conference Abstract. Oral presentation at XII International Conference on Cognitive Neuroscience (ICON-XII), Brisbane, Queensland, Australia, July 27 - 31}
+
+\cvitem{7}{\textbf{Love, S.A.,} Fukushima, M., Doyle, R.C., Saunders, R.C., Fujii, N., Belin, P., Mishkin, M., Leopold, D.A., 2014. Norm-based neural coding of conspecific vocalizations in the macaque monkey. Poster at Society for Neuroscience, Washington DC, November 15 – 19}
+
+\cvitem{8}{\textbf{Love, S.A.,} Latinus, M., Belin, P., 2014. Investigating categorization selectivity in the auditory cortex with high spatial resolution fMRI. Poster at International Conference on Auditory Cortex, Magdeburg September 13 – 17}
+
+\cvitem{9}{Regener, P., \textbf{Love, S.A.,} Petrini, K., Pollick, F., 2014 Audiovisual processing differences in autism spectrum disorder revealed by a model-based analysis of simultaneity and temporal order judgments. Poster at Vision Sciences Society Conference, Florida, USA, May 16-21}
+
+\cvitem{10}{Petrini, K., Denis, G., \textbf{Love, S.A,} Nardini, M., 2013. The face and voice of multisensory integration: prior knowledge affects multisensory integration from early childhood. Oral presentation at Vision Sciences Society Conference, Florida, USA, May 10-15}
+
+\cvitem{11}{Regener, P., \textbf{Love, S.A.,} Petrini, K., Simmons, D., Pollick, F., 2013. Audiovisual temporal integration in Autism Spectrum Disorder. Poster at Vision Sciences Society Conference, Florida, USA, May 10-15}
+
+\cvitem{12}{Latinus, M., Joassin, F., Watson, R., Charest, I., \textbf{Love, S.A,} McAleer, P., Belin, P., 2011. Conjoint and independent neural coding of bimodal face/voice identity investigated with fMRI. Perception 40 ECVP Abstract Supplement, pp. 23. Oral presentation at European Conference on Visual Perception, Toulouse, France, Aug 28 – Sept 1}
+
+\cvitem{13}{McAleer, P., Becirspahic, M., Pollick, F. E., Paterson, H. M., Latinus, M., Belin, P., \textbf{Love, S.A.,} 2011. Giving life to circles and rectangles: Animacy, intention and fMRI. Perception 40 ECVP Abstract Supplement, pp. 16. Oral presentation at European Conference on Visual Perception, Toulouse, France, Aug 28 – Sept 1}
+
+\cvitem{14}{Latinus, M., Joassin, F., Watson, R., Charest, I., \textbf{Love, S.A.,} Belin, P., 2011. Conjoint and independent neural coding of bimodal face/voice identity investigated with fMRI. Poster at Human Brain Mapping Conference, Quebec, Canada, June 26-30}
+
+\cvitem{15}{\textbf{Love, S.,} Petrini, K., Cheng, A., Pollick, F.E., 2011. Differences between synchrony and temporal order judgments for simple and Complex Stimuli. Journal of Vision Vol. 11(11) pp. 798. Poster at Vision Sciences Society Conference, Florida, USA, May 6-11}
+
+\cvitem{16}{McAleer, P., Becirspahic, M., \textbf{Love, S.A.,} 2011. How does your brain see “living” circles: A study of animacy and intention using fMRI. i-Perception 2(3) 200. Oral presentation at Scottish Vision Group Conference, Skye, Scotland, March 25-27}
+
+\cvitem{17}{\textbf{Love, S.,} Latinus, M., McAleer, P., Pollick, F.E., 2010. Investigating synchrony perception of audiovisual speech with a continuous carry-over fMRI design. Poster at Human Brain Mapping Conference, Barcelona, Spain, June 6-10}
+
+\cvitem{18}{McAleer, P., Pollick, F.E., Crabbe, F., \textbf{Love, S.,} Zacks, J.M., 2010. hMT+ and pSTS correlate with motion properties viewed in long video displays of human activities. Poster at Human Brain Mapping Conference, Barcelona, Spain, June 6-10}
+
+\cvitem{19}{\textbf{Love, S.,} Latinus, M., McAleer, P., Pollick, F.E. (2010). Investigating synchrony perception of audiovisual speech with a continuous carry-over fMRI design. Poster at International Multisensory Research Forum Conference, Liverpool, UK, June 16-19}
+
+\cvitem{20}{\textbf{Love, S.,} Hillis, J.M., Pollick, F.E., 2008. Does optimal integration of auditory and visual cues occur in a complex temporal task? Poster at International Multisensory Research Forum Conference, Hamburg, Germany, July 16-19}
+
+\cvitem{21}{\textbf{Love, S.,} Hillis, J.M., Waadeland, C.H., Rocchesso, D., Avanzini, F., Dahl, S., Pollick, F.E. 2007. How audio and visual cues combine to discriminate the tempo of swing groove drumming. Journal of Vision Vol. 7(9) pp. 870a. Poster at Vision Sciences Society Conference, Florida, USA, May 11-16}
+
+\cvitem{22}{Pollick, F.E., \textbf{Love, S.,} Hillis, J.M., Russell, M., Petrini, K., 2007. Is musical experience equal to the sum of sight and sound? An investigation of swing groove drumming. Oral presentation at Society for Music Perception and Cognition Conference, Montreal, Canada, July 30 - Aug 3}
+
+\end{document}
