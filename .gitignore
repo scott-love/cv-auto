@@ -1,0 +1,18 @@
+# Build artifacts — generated files, do not commit
+build/
+
+# Python byte-code caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor / OS files
+.DS_Store
+*.swp
+*.swo

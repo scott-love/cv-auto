@@ -1,0 +1,187 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% cv.tex.j2 — Jinja2 template for Scott A. Love's CV
+% Rendered by:  scripts/generate_latex.py
+% Output:       build/cv.tex
+%
+% Requires moderncv.cls and the accompanying .sty files to be in
+% the same directory as the compiled .tex file (copy from templates/).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+{% set p = personal %}
+{% set theme = cv.theme %}
+
+%-------------------------------------------------------------------
+%  DOCUMENT CLASS & THEME
+%-------------------------------------------------------------------
+\documentclass[11pt,a4paper,sans]{moderncv}
+
+\moderncvstyle{ {{- theme.style -}} }   % casual | classic | oldstyle | banking | empty
+\moderncvcolor{ {{- theme.color -}} }   % blue | orange | green | red | purple | grey | black
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[scale=.84]{geometry}
+\setlength{\hintscolumnwidth}{2.5cm}
+
+%-------------------------------------------------------------------
+%  PERSONAL INFORMATION
+%-------------------------------------------------------------------
+\firstname{ {{- p.firstname -}} }
+\familyname{ {{- p.familyname -}} }
+{% if p.title %}\title{ {{- p.title -}} }{% endif %}
+{% if p.email %}\email{ {{- p.email -}} }{% endif %}
+{% if p.mobile %}\mobile{ {{- p.mobile -}} }{% endif %}
+{% if p.homepage %}\homepage{ {{- p.homepage -}} }{ {{- p.homepage -}} }{% endif %}
+{% if p.orcid %}\extrainfo{ORCID: orcid.org/{{ p.orcid }}}{% endif %}
+{% if p.photo %}\photo[70pt][0.4pt]{ {{- p.photo -}} }{% endif %}
+
+%-------------------------------------------------------------------
+
+\begin{document}
+
+\makecvtitle
+
+%-------------------------------------------------------------------
+%  EDUCATION
+%-------------------------------------------------------------------
+\section{Education}
+
+{% for edu in education -%}
+{%- set date_str = edu.start ~ " -- " ~ edu.end if edu.end else edu.start ~ " -- present" -%}
+\cventry{ {{- date_str -}} }{ {{- edu.degree -}} }{}{}{}{ {{- edu.honours | default("") -}} }
+{% if edu.thesis_title %}\cvitem{Title}{\emph{ {{- edu.thesis_title -}} }}{% endif %}
+{% if edu.supervisor %}\cvitem{Supervisor}{ {{- edu.supervisor -}} }{% endif %}
+{% if edu.description %}\cvitem{Description}{ {{- edu.description -}} }{% endif %}
+
+{% endfor %}
+
+%-------------------------------------------------------------------
+%  PROFESSIONAL EXPERIENCE
+%-------------------------------------------------------------------
+\section{Professional Experience}
+
+{% if experience.research %}
+\subsection{Research}
+{% for job in experience.research -%}
+{%- set date_str = job.start ~ " -- " ~ (job.end if job.end else "present") -%}
+\cventry{ {{- date_str -}} }{ {{- job.position -}} }{ {{- job.institution -}} }{ {{- job.country -}} }{}{}
+{% if job.team %}\cvitem{Team}{ {{- job.team -}} }{% endif %}
+{% if job.supervisor %}\cvitem{Supervisor}{ {{- job.supervisor -}} }{% endif %}
+{% if job.description %}\cvitem{Description}{ {{- job.description -}} }{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if experience.teaching %}
+\subsection{Teaching}
+{% for job in experience.teaching -%}
+{%- if job.start is defined and job.end is defined -%}
+  {%- set date_str = job.start ~ " -- " ~ job.end -%}
+{%- elif job.year is defined -%}
+  {%- set date_str = job.year | string -%}
+{%- else -%}
+  {%- set date_str = "" -%}
+{%- endif -%}
+\cventry{ {{- date_str -}} }{ {{- job.course -}} }{ {{- job.institution -}} }{}{}{ {{- job.notes | default("") -}} }
+{% endfor %}
+{% endif %}
+
+%-------------------------------------------------------------------
+%  HONORS & AWARDS
+%-------------------------------------------------------------------
+{% if honors_awards %}
+\section{Honors \& Awards}
+
+{% for award in honors_awards -%}
+\cvitem{ {{- award.year -}} }{ {{- award.award -}} }
+{% endfor %}
+{% endif %}
+
+%-------------------------------------------------------------------
+%  SKILLS
+%-------------------------------------------------------------------
+{% if skills %}
+\section{Skills}
+
+{% for key, skill in skills.items() -%}
+\cvitem{ {{- skill.label -}} }{ {{- skill.tools | join(", ") -}} }
+{% endfor %}
+{% endif %}
+
+%-------------------------------------------------------------------
+%  LANGUAGES
+%-------------------------------------------------------------------
+{% if languages %}
+\section{Languages}
+
+{% for lang in languages -%}
+\cvitemwithcomment{ {{- lang.language -}} }{ {{- lang.proficiency -}} }{ {{- lang.scale | default("") -}} }
+{% endfor %}
+{% endif %}
+
+%-------------------------------------------------------------------
+%  PUBLICATIONS
+%-------------------------------------------------------------------
+\section{Publications}
+
+{# ---- helper macro: render an author list, bolding Love's name ---- #}
+{%- macro render_authors(authors) -%}
+  {%- for a in authors -%}
+    {%- if "Love" in a -%}
+      \textbf{ {{- a -}} }
+    {%- else -%}
+      {{- a -}}
+    {%- endif -%}
+    {%- if not loop.last -%}, {% endif -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{% if publications.journal_articles %}
+\subsection{Peer-reviewed articles}
+
+{% for pub in publications.journal_articles -%}
+{%- if pub.impact_factor and pub.quartile -%}
+  {%- set label = "IF = " ~ pub.impact_factor ~ " (" ~ pub.quartile ~ ")" -%}
+{%- else -%}
+  {%- set label = "" -%}
+{%- endif -%}
+\cvitem{ {{- label -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title }} \textit{ {{- pub.journal -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
+{% endfor %}
+{% endif %}
+
+{% if publications.book_chapters %}
+\subsection{Book chapters}
+
+{% for pub in publications.book_chapters -%}
+{%- set idx = loop.index -%}
+\cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title }}{% if pub.editors %}, in: {{ pub.editors | join(", ") }} (Eds.){% endif %}, \textit{ {{- pub.book -}} }{% if pub.publisher %}, {{ pub.publisher }}{% endif %}}
+{% endfor %}
+{% endif %}
+
+{% if publications.under_review_or_in_prep %}
+\subsection{Under review or in preparation}
+
+{% for pub in publications.under_review_or_in_prep -%}
+{%- set idx = loop.index -%}
+{%- if pub.authors and pub.authors | length > 0 -%}
+  {%- set author_str = render_authors(pub.authors) -%}
+{%- else -%}
+  {%- set author_str = pub.title -%}
+{%- endif -%}
+\cvitem{ {{- idx -}} }{ {{- author_str -}}{% if pub.authors and pub.authors | length > 0 and pub.year %} ({{ pub.year }}){% endif %}{% if pub.authors and pub.authors | length > 0 and pub.title %}. {{ pub.title }}{% endif %}{% if pub.journal %} \textit{ {{- pub.journal -}} }{% endif %}{% if pub.status %} ({{ pub.status }}){% endif %}}
+{% endfor %}
+{% endif %}
+
+%-------------------------------------------------------------------
+%  CONFERENCE PRESENTATIONS
+%-------------------------------------------------------------------
+{% if conference_presentations %}
+\section{Conference Presentations}
+
+{% for pres in conference_presentations -%}
+{%- set idx = loop.index -%}
+\cvitem{ {{- idx -}} }{ {{- render_authors(pres.authors) }} {{ pres.year }}. {{ pres.title }}.{% if pres.venue %} {{ pres.type | title }} at {{ pres.venue }}{% if pres.location %}, {{ pres.location }}{% endif %}{% if pres.date %}, {{ pres.date }}{% endif %}{% else %} {{ pres.type | title }}{% endif %}}
+{% endfor %}
+{% endif %}
+
+\end{document}
