@@ -669,16 +669,17 @@ def _yaml_list_of_str(items: list, indent_spaces: int = 6) -> str:
 
 
 def serialise_personal(p: dict) -> str:
+    empty = '""'
     return (
         "personal:\n"
         f"  firstname: {yaml_str(p['firstname'])}\n"
         f"  familyname: {yaml_str(p['familyname'])}\n"
         f"  title: {yaml_str(p['title'])}\n"
-        f"  email: {p['email'] or '\"\"'}\n"
-        f"  orcid: {yaml_str(p['orcid']) if p['orcid'] else '\"\"'}  # manual\n"
-        f"  photo: {p['photo'] or '\"\"'}\n"
-        f"  homepage: {yaml_str(p['homepage']) if p['homepage'] else '\"\"'}\n"
-        f"  mobile: {yaml_str(p['mobile']) if p['mobile'] else '\"\"'}\n"
+        f"  email: {p['email'] or empty}\n"
+        f"  orcid: {yaml_str(p['orcid']) if p['orcid'] else empty}  # manual\n"
+        f"  photo: {p['photo'] or empty}\n"
+        f"  homepage: {yaml_str(p['homepage']) if p['homepage'] else empty}\n"
+        f"  mobile: {yaml_str(p['mobile']) if p['mobile'] else empty}\n"
     )
 
 
@@ -732,6 +733,7 @@ def serialise_experience(exp: dict) -> str:
 
 def _serialise_pub(p: dict, base_indent: int = 4) -> list:
     pad = " " * base_indent
+    empty = '""'
     lines = []
     sync_val = p.get("sync", "auto   # auto-sync")
     lines.append(f"{pad}- sync: {sync_val}")
@@ -743,7 +745,7 @@ def _serialise_pub(p: dict, base_indent: int = 4) -> list:
             lines.append(f"{pad}    - {yaml_str(a)}")
     else:
         lines.append(f"{pad}  authors: []")
-    lines.append(f"{pad}  year: {p.get('year', '') or '\"\"'}")
+    lines.append(f"{pad}  year: {p.get('year', '') or empty}")
     lines.append(f"{pad}  title: {yaml_str(p.get('title', ''))}")
     if "journal" in p:
         lines.append(f"{pad}  journal: {yaml_str(p.get('journal', ''))}")
