@@ -140,12 +140,7 @@
 \subsection{Peer-reviewed articles}
 
 {% for pub in publications.journal_articles -%}
-{%- if pub.impact_factor and pub.quartile -%}
-  {%- set label = "IF = " ~ pub.impact_factor ~ " (" ~ pub.quartile ~ ")" -%}
-{%- else -%}
-  {%- set label = "" -%}
-{%- endif -%}
-\cvitem{ {{- label -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
+\cvitem{}{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
 {% endfor %}
 {% endif %}
 
