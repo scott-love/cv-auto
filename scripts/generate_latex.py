@@ -115,18 +115,18 @@ def write_output(path: Path, content: str) -> None:
 def print_summary(data: dict, output: Path) -> None:
     """Print a human-readable summary of what was rendered."""
     pubs = data.get("publications", {})
-    journal_n = len(pubs.get("journal_articles", []))
-    chapter_n = len(pubs.get("book_chapters", []))
-    review_n = len(pubs.get("under_review_or_in_prep", []))
-    conf_n = len(data.get("conference_presentations", []))
+    journal_n = len(pubs.get("journal_articles", []) or [])
+    chapter_n = len(pubs.get("book_chapters", []) or [])
+    review_n = len(pubs.get("under_review_or_in_prep", []) or [])
+    conf_n = len(data.get("conference_presentations", []) or [])
 
-    edu_n = len(data.get("education", []))
+    edu_n = len(data.get("education", []) or [])
     exp = data.get("experience", {})
-    research_n = len(exp.get("research", []))
-    teaching_n = len(exp.get("teaching", []))
-    skills_n = len(data.get("skills", {}))
-    lang_n = len(data.get("languages", []))
-    awards_n = len(data.get("honors_awards", []))
+    research_n = len(exp.get("research", []) or [])
+    teaching_n = len(exp.get("teaching", []) or [])
+    skills_n = len(data.get("skills", {}) or {})
+    lang_n = len(data.get("languages", []) or [])
+    awards_n = len(data.get("honors_awards", []) or [])
 
     print("=" * 60)
     print(f"  Generated: {output}")
