@@ -26,11 +26,11 @@
 %-------------------------------------------------------------------
 %  PERSONAL INFORMATION
 %-------------------------------------------------------------------
-\firstname{ {{- p.firstname -}} }
-\familyname{ {{- p.familyname -}} }
-{% if p.title %}\title{ {{- p.title -}} }{% endif %}
+\firstname{ {{- p.firstname | escape_latex -}} }
+\familyname{ {{- p.familyname | escape_latex -}} }
+{% if p.title %}\title{ {{- p.title | escape_latex -}} }{% endif %}
 {% if p.email %}\email{ {{- p.email -}} }{% endif %}
-{% if p.mobile %}\mobile{ {{- p.mobile -}} }{% endif %}
+{% if p.mobile %}\mobile{ {{- p.mobile | escape_latex -}} }{% endif %}
 {% if p.homepage %}\homepage{ {{- p.homepage -}} }{ {{- p.homepage -}} }{% endif %}
 {% if p.orcid %}\extrainfo{ORCID: orcid.org/{{ p.orcid }}}{% endif %}
 {% if p.photo %}\photo[70pt][0.4pt]{ {{- p.photo -}} }{% endif %}
@@ -48,10 +48,10 @@
 
 {% for edu in education -%}
 {%- set date_str = edu.start ~ " -- " ~ edu.end if edu.end else edu.start ~ " -- present" -%}
-\cventry{ {{- date_str -}} }{ {{- edu.degree -}} }{}{}{}{ {{- edu.honours | default("") -}} }
-{% if edu.thesis_title %}\cvitem{Title}{\emph{ {{- edu.thesis_title -}} }}{% endif %}
-{% if edu.supervisor %}\cvitem{Supervisor}{ {{- edu.supervisor -}} }{% endif %}
-{% if edu.description %}\cvitem{Description}{ {{- edu.description -}} }{% endif %}
+\cventry{ {{- date_str -}} }{ {{- edu.degree | escape_latex -}} }{}{}{}{ {{- edu.honours | default("") | escape_latex -}} }
+{% if edu.thesis_title %}\cvitem{Title}{\emph{ {{- edu.thesis_title | escape_latex -}} }}{% endif %}
+{% if edu.supervisor %}\cvitem{Supervisor}{ {{- edu.supervisor | escape_latex -}} }{% endif %}
+{% if edu.description %}\cvitem{Description}{ {{- edu.description | escape_latex -}} }{% endif %}
 
 {% endfor %}
 
@@ -64,10 +64,10 @@
 \subsection{Research}
 {% for job in experience.research -%}
 {%- set date_str = job.start ~ " -- " ~ (job.end if job.end else "present") -%}
-\cventry{ {{- date_str -}} }{ {{- job.position -}} }{ {{- job.institution -}} }{ {{- job.country -}} }{}{}
-{% if job.team %}\cvitem{Team}{ {{- job.team -}} }{% endif %}
-{% if job.supervisor %}\cvitem{Supervisor}{ {{- job.supervisor -}} }{% endif %}
-{% if job.description %}\cvitem{Description}{ {{- job.description -}} }{% endif %}
+\cventry{ {{- date_str -}} }{ {{- job.position | escape_latex -}} }{ {{- job.institution | escape_latex -}} }{ {{- job.country | escape_latex -}} }{}{}
+{% if job.team %}\cvitem{Team}{ {{- job.team | escape_latex -}} }{% endif %}
+{% if job.supervisor %}\cvitem{Supervisor}{ {{- job.supervisor | escape_latex -}} }{% endif %}
+{% if job.description %}\cvitem{Description}{ {{- job.description | escape_latex -}} }{% endif %}
 
 {% endfor %}
 {% endif %}
@@ -82,7 +82,7 @@
 {%- else -%}
   {%- set date_str = "" -%}
 {%- endif -%}
-\cventry{ {{- date_str -}} }{ {{- job.course -}} }{ {{- job.institution -}} }{}{}{ {{- job.notes | default("") -}} }
+\cventry{ {{- date_str -}} }{ {{- job.course | escape_latex -}} }{ {{- job.institution | escape_latex -}} }{}{}{ {{- job.notes | default("") | escape_latex -}} }
 {% endfor %}
 {% endif %}
 
@@ -93,7 +93,7 @@
 \section{Honors \& Awards}
 
 {% for award in honors_awards -%}
-\cvitem{ {{- award.year -}} }{ {{- award.award -}} }
+\cvitem{ {{- award.year -}} }{ {{- award.award | escape_latex -}} }
 {% endfor %}
 {% endif %}
 
@@ -104,7 +104,7 @@
 \section{Skills}
 
 {% for key, skill in skills.items() -%}
-\cvitem{ {{- skill.label -}} }{ {{- skill.tools | join(", ") -}} }
+\cvitem{ {{- skill.label | escape_latex -}} }{ {{- skill.tools | join(", ") | escape_latex -}} }
 {% endfor %}
 {% endif %}
 
@@ -115,7 +115,7 @@
 \section{Languages}
 
 {% for lang in languages -%}
-\cvitemwithcomment{ {{- lang.language -}} }{ {{- lang.proficiency -}} }{ {{- lang.scale | default("") -}} }
+\cvitemwithcomment{ {{- lang.language | escape_latex -}} }{ {{- lang.proficiency | escape_latex -}} }{ {{- lang.scale | default("") | escape_latex -}} }
 {% endfor %}
 {% endif %}
 
@@ -145,7 +145,7 @@
 {%- else -%}
   {%- set label = "" -%}
 {%- endif -%}
-\cvitem{ {{- label -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title }} \textit{ {{- pub.journal -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
+\cvitem{ {{- label -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -154,7 +154,7 @@
 
 {% for pub in publications.book_chapters -%}
 {%- set idx = loop.index -%}
-\cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title }}{% if pub.editors %}, in: {{ pub.editors | join(", ") }} (Eds.){% endif %}, \textit{ {{- pub.book -}} }{% if pub.publisher %}, {{ pub.publisher }}{% endif %}}
+\cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }}{% if pub.editors %}, in: {{ pub.editors | join(", ") }} (Eds.){% endif %}, \textit{ {{- pub.book | escape_latex -}} }{% if pub.publisher %}, {{ pub.publisher | escape_latex }}{% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -168,7 +168,7 @@
 {%- else -%}
   {%- set author_str = pub.title -%}
 {%- endif -%}
-\cvitem{ {{- idx -}} }{ {{- author_str -}}{% if pub.authors and pub.authors | length > 0 and pub.year %} ({{ pub.year }}){% endif %}{% if pub.authors and pub.authors | length > 0 and pub.title %}. {{ pub.title }}{% endif %}{% if pub.journal %} \textit{ {{- pub.journal -}} }{% endif %}{% if pub.status %} ({{ pub.status }}){% endif %}}
+\cvitem{ {{- idx -}} }{ {{- author_str -}}{% if pub.authors and pub.authors | length > 0 and pub.year %} ({{ pub.year }}){% endif %}{% if pub.authors and pub.authors | length > 0 and pub.title %}. {{ pub.title | escape_latex }}{% endif %}{% if pub.journal %} \textit{ {{- pub.journal | escape_latex -}} }{% endif %}{% if pub.status %} ({{ pub.status | escape_latex }}){% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -180,7 +180,7 @@
 
 {% for pres in conference_presentations -%}
 {%- set idx = loop.index -%}
-\cvitem{ {{- idx -}} }{ {{- render_authors(pres.authors) }} {{ pres.year }}. {{ pres.title }}.{% if pres.venue %} {{ pres.type | title }} at {{ pres.venue }}{% if pres.location %}, {{ pres.location }}{% endif %}{% if pres.date %}, {{ pres.date }}{% endif %}{% else %} {{ pres.type | title }}{% endif %}}
+\cvitem{ {{- idx -}} }{ {{- render_authors(pres.authors) }} {{ pres.year }}. {{ pres.title | escape_latex }}.{% if pres.venue %} {{ pres.type | title }} at {{ pres.venue | escape_latex }}{% if pres.location %}, {{ pres.location | escape_latex }}{% endif %}{% if pres.date %}, {{ pres.date }}{% endif %}{% else %} {{ pres.type | title }}{% endif %}}
 {% endfor %}
 {% endif %}
 

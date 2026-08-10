@@ -76,7 +76,7 @@ education:
     supervisor: Professor Frank Pollick
     description: ""
 
-  - degree: "MA Social Sciences: Psychology \\& Philosophy"
+  - degree: "MA Social Sciences: Psychology & Philosophy"
     institution: The University of Glasgow
     country: UK
     start: 2002
@@ -290,7 +290,7 @@ publications:
         - "Zacks, J.M"
       year: 2013
       title: The role of kinematics in cortical regions for continuous human motion perception
-      journal: "Cognitive, affective \\& behavioral neuroscience 14(1),"
+      journal: "Cognitive, affective & behavioral neuroscience 14(1),"
       volume: ""
       pages: ""
       impact_factor: 3.2

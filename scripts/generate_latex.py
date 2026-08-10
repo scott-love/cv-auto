@@ -64,6 +64,24 @@ def load_yaml(path: Path) -> dict:
     return data
 
 
+def escape_latex(text: str) -> str:
+    """Escape special LaTeX characters in a plain-text string."""
+    if not isinstance(text, str):
+        return text
+    # Backslash must be replaced first to avoid double-escaping later replacements.
+    text = text.replace("\\", r"\textbackslash{}")
+    text = text.replace("&",  r"\&")
+    text = text.replace("%",  r"\%")
+    text = text.replace("$",  r"\$")
+    text = text.replace("#",  r"\#")
+    text = text.replace("_",  r"\_")
+    text = text.replace("{",  r"\{")
+    text = text.replace("}",  r"\}")
+    text = text.replace("~",  r"\textasciitilde{}")
+    text = text.replace("^",  r"\textasciicircum{}")
+    return text
+
+
 def render_template(template_path: Path, context: dict) -> str:
     """Render a Jinja2 template with the given context dict."""
     env = Environment(
@@ -73,6 +91,7 @@ def render_template(template_path: Path, context: dict) -> str:
         lstrip_blocks=True,
         keep_trailing_newline=True,
     )
+    env.filters["escape_latex"] = escape_latex
     try:
         tmpl = env.get_template(template_path.name)
     except TemplateNotFound:
