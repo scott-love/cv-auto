@@ -60,7 +60,7 @@ personal:
   title: "May 1981, UK Citizen"
   email: scott.love@inrae.fr
   orcid: "0000-0001-7416-9210"  # manual
-  id_hal: ""  # manual
+  id_hal: "scott-love"  # manual
   photo: pictures/scott
   homepage: "scott-love.github.io"
   mobile: ""
