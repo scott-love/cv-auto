@@ -8,7 +8,7 @@ This project helps you:
 
 - ✅ **Start from an existing Overleaf/LaTeX CV** (or any moderncv LaTeX source)
 - ✅ **Extract CV content once** into structured YAML data
-- ✅ **Keep the CV easy to update** by editing YAML or Overleaf (your choice)
+- ✅ **Keep the CV easy to update** by editing canonical YAML data
 - ✅ **Automatically sync publications** from HAL and ORCID
 - ✅ **Generate a fresh LaTeX CV** whenever you want
 - ✅ **Avoid vendor lock-in** — everything is free, open, and reproducible
@@ -64,8 +64,8 @@ HAL API / ORCID API
           ↓
     [sync_publications_hal.py]
           ↓
-    Merges new publications into data/cv.yaml
-    (respects manual entries)
+    Merges upstream publication metadata into data/cv.yaml
+    (respects manual entries; local YAML stays canonical)
 ```
 
 ---
@@ -117,16 +117,16 @@ This produces `build/cv.pdf`.
 
 ```bash
 python scripts/sync_publications_hal.py \
-  --hal-author "scott-love" \
-  --orcid "0000-0001-7416-9210" \
-  --cv-file data/cv.yaml
+  --cv-file data/cv.yaml \
+  --dry-run
 ```
 
 This script:
-- Fetches your publications from HAL and ORCID
-- Merges new entries into `data/cv.yaml`
+- Uses `personal.id_hal` and `personal.orcid` by default
+- Treats HAL as the primary source for type/category and record quality
+- Lets ORCID fill missing metadata when enabled
 - Preserves any entries you marked as `sync: manual`
-- Asks before overwriting existing entries
+- Prints a deterministic sync report before you apply changes
 
 ---
 
@@ -140,6 +140,7 @@ personal:
   familyname: "Love, PhD"
   email: love.a.scott@gmail.com
   orcid: "0000-0001-7416-9210"  # manual
+  id_hal: "scott-love"          # manual
 
 education:
   - degree: "Ph.D. Psychology"
@@ -173,6 +174,12 @@ publications:
 - **`sync: auto`** — Entry may be updated by sync scripts. Use this for citations fetched from APIs.
 - **`sync: manual`** — Entry is hand-maintained. Sync scripts will never overwrite it.
 
+### Source of Truth Policy
+
+- `data/cv.yaml` is the long-term canonical source of truth.
+- HAL and ORCID are upstream providers used to suggest or merge publication metadata.
+- Manual/local values win over synced values, except HAL is preferred for publication type/category when sync updates an existing auto-managed record.
+
 See `data/README.md` for full field documentation.
 
 ---
@@ -200,8 +207,8 @@ python scripts/extract_from_latex.py
 ```
 
 Good for:
-- Maintaining a single "pretty" version in Overleaf
-- Periodic bulk imports
+- Refreshing from a seed LaTeX source when needed
+- Periodic bulk imports into structured data
 
 ### **Option C: Sync publications, edit entries**
 
@@ -219,23 +226,45 @@ Then edit `data/cv.yaml` as needed.
 
 ### HAL Author ID
 
+Store your HAL author identifier in `data/cv.yaml`:
+```yaml
+personal:
+  id_hal: "scott-love"
+```
+
 Find your HAL author ID:
 1. Go to https://hal.archives-ouvertes.fr/
 2. Search for your name
 3. Click your profile
 4. Your ID is in the URL: `https://hal.archives-ouvertes.fr/search/index/?q=scott-love` → use `scott-love`
 
-Or set it in the script call:
+Override it on the command line if needed:
 ```bash
-python scripts/sync_publications_hal.py --hal-author "scott-love"
+python scripts/sync_publications_hal.py --hal-id "scott-love"
 ```
 
 ### ORCID
 
-Your ORCID is already in `data/cv.yaml`:
+Your ORCID remains optional and can stay in `data/cv.yaml`:
 ```yaml
 personal:
   orcid: "0000-0001-7416-9210"
+```
+
+### Source modes
+
+`publication_sync.source_mode` supports:
+
+- `hal_only`
+- `orcid_only`
+- `hal_plus_orcid` (default when both IDs are present)
+
+Examples:
+
+```bash
+python scripts/sync_publications_hal.py --dry-run --source-mode hal_only
+python scripts/sync_publications_hal.py --dry-run --source-mode hal_plus_orcid
+python scripts/sync_publications_hal.py --apply --report-file build/publication-sync-report.md
 ```
 
 ---
@@ -260,6 +289,12 @@ publication_sync:
     - doi: "10.1234/example"
     - title: "A Paper I Want to Keep Exactly As Is"
 ```
+
+Recommended workflow:
+1. Run the sync in `--dry-run` mode.
+2. Review the markdown/console report.
+3. Mark any locally curated entries as `sync: manual`.
+4. Re-run with `--apply` once the merge plan looks correct.
 
 ---
 

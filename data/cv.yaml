@@ -24,13 +24,12 @@ cv:
 
 # Publication sync configuration
 publication_sync:
+  # Local YAML data remains canonical ground truth; remote sync only proposes
+  # upstream publication metadata that can be merged back into this file.
+  source_mode: hal_plus_orcid  # hal_only | orcid_only | hal_plus_orcid
   sources:
-    orcid: true
-    openalex: true
-    crossref: true
     hal: true
-    pubmed: false
-    scholar: false
+    orcid: true
   # Publications whose DOI or title matches an entry here are treated as
   # 'manual' and will never be overwritten by the sync scripts.
   manual_overrides: []
@@ -46,6 +45,7 @@ personal:
   title: "May 1981, UK Citizen"
   email: love.a.scott@gmail.com
   orcid: "0000-0001-7416-9210"  # manual
+  id_hal: "scott-love"  # manual
   photo: pictures/scott
   homepage: "scott-love.github.io"
   mobile: ""
@@ -816,5 +816,4 @@ honors_awards:
 
   - year: 2008
     award: "Attendance funding award, Workshop “Cue Combination - Unifying perceptual theory”"
-
 
