@@ -1,11 +1,12 @@
-# Structured CV data placeholder
+# Structured CV data
 
-This directory holds the canonical structured representation of the CV.
+This directory holds the structured source data for the CV.
 
-Suggested future file:
-- `cv.yaml`
+## Files
 
-The data should be easy to edit by hand and suitable for generation into LaTeX.
-External sync providers such as HAL and ORCID should be treated as upstream
-sources whose metadata is merged back into `cv.yaml`, not as repository
-ground truth.
+- `cv.base.yaml` — canonical manually maintained CV data, excluding publications
+- `publications.yaml` — publication-like data used by sync and manual overrides
+- `cv.yaml` — legacy combined file kept for compatibility/migration
+
+External sync providers such as HAL and ORCID are upstream metadata sources,
+not the repository source of truth.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Sync publications from HAL and/or ORCID into data/cv.yaml.
+Sync publications from HAL and/or ORCID into split publication data.
 
 Local YAML data remains the canonical source of truth. External services are
 treated as upstream providers whose records are normalized, merged, and then
@@ -27,10 +27,26 @@ try:
 except ImportError:
     sys.exit("Error: PyYAML is not installed. Run: pip install pyyaml")
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from cv_data import (
+    DEFAULT_BASE_FILE,
+    DEFAULT_PUBLICATIONS_FILE,
+    LEGACY_CV_FILE,
+    assign_publication_indices,
+    load_yaml,
+    load_cv_data,
+    normalize_publication_like_entry,
+    publication_payload_from_cv,
+    save_yaml,
+)
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CV_FILE = REPO_ROOT / "data" / "cv.yaml"
-DEFAULT_SYNCED_FILE = REPO_ROOT / "data" / "cv.synced.yaml"
+DEFAULT_CV_FILE = LEGACY_CV_FILE
+DEFAULT_SYNCED_FILE = DEFAULT_PUBLICATIONS_FILE
 
 SECTION_FIELDS = {
     "journal_articles": [
@@ -118,7 +134,9 @@ ORCID_TYPE_MAP = {
 
 @dataclass
 class SyncConfig:
-    cv_file: Path
+    cv_file: Path | None
+    base_file: Path
+    publications_file: Path
     output_file: Path
     source_mode: str
     hal_id: str
@@ -129,11 +147,28 @@ class SyncConfig:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cv-file", default=str(DEFAULT_CV_FILE), help="Path to data/cv.yaml (canonical input)")
+    parser.add_argument(
+        "--cv-file",
+        help="Optional legacy mixed CV file (for example data/cv.yaml)",
+    )
+    parser.add_argument(
+        "--base-file",
+        default=str(DEFAULT_BASE_FILE),
+        help=f"Path to base CV data (default: {DEFAULT_BASE_FILE})",
+    )
+    parser.add_argument(
+        "--publications-file",
+        default=str(DEFAULT_PUBLICATIONS_FILE),
+        help=f"Path to publication data (default: {DEFAULT_PUBLICATIONS_FILE})",
+    )
     parser.add_argument(
         "--output-file",
         default=str(DEFAULT_SYNCED_FILE),
-        help="Path for synced output (default: data/cv.synced.yaml). Use --cv-file value to overwrite canonical.",
+        help=(
+            "Path for synced publication output "
+            f"(default: {DEFAULT_PUBLICATIONS_FILE}). "
+            "Use --publications-file or --cv-file value to overwrite canonical input."
+        ),
     )
     parser.add_argument(
         "--source-mode",
@@ -150,33 +185,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode_group.add_argument("--dry-run", action="store_true", help="Preview without changing files")
     mode_group.add_argument("--apply", action="store_true", help="Write merged output to --output-file")
     return parser.parse_args(argv)
-
-
-def load_yaml(path: Path) -> dict[str, Any]:
-    try:
-        with path.open(encoding="utf-8") as handle:
-            data = yaml.safe_load(handle)
-    except FileNotFoundError:
-        sys.exit(f"Error: YAML file not found: {path}")
-    except yaml.YAMLError as exc:
-        sys.exit(f"Error: Malformed YAML in {path}:\n{exc}")
-    if not isinstance(data, dict):
-        sys.exit(f"Error: Expected a mapping at the top level of {path}")
-    return data
-
-
-def save_yaml(path: Path, data: dict[str, Any], header: str | None = None) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        if header:
-            handle.write(header)
-        yaml.safe_dump(
-            data,
-            handle,
-            allow_unicode=True,
-            sort_keys=False,
-            default_flow_style=False,
-        )
 
 
 def normalize_text(value: Any) -> str:
@@ -263,7 +271,9 @@ def build_sync_config(args: argparse.Namespace, cv_data: dict[str, Any]) -> Sync
         sys.exit("Error: ORCID source mode requires --orcid or personal.orcid")
 
     return SyncConfig(
-        cv_file=Path(args.cv_file),
+        cv_file=Path(args.cv_file) if args.cv_file else None,
+        base_file=Path(args.base_file),
+        publications_file=Path(args.publications_file),
         output_file=Path(args.output_file),
         source_mode=source_mode,
         hal_id=hal_id,
@@ -755,6 +765,13 @@ def sync_publications(
     dedup_actions = classify_and_dedup_preprints(publications)
     report["deduped_preprints"] = dedup_actions
 
+    normalized_payload = assign_publication_indices(
+        publication_payload_from_cv(cv_data),
+        reverse_numbering=bool((cv_data.get("cv") or {}).get("pub_reverse_numbering", False)),
+    )
+    cv_data["publications"] = normalized_payload["publications"]
+    cv_data["conference_presentations"] = normalized_payload["conference_presentations"]
+
     return cv_data, report
 
 
@@ -837,8 +854,17 @@ def gather_upstream_records(config: SyncConfig) -> tuple[list[dict[str, Any]], l
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    cv_file = Path(args.cv_file)
-    cv_data = load_yaml(cv_file)
+    if args.cv_file:
+        cv_data = load_yaml(Path(args.cv_file))
+    else:
+        cv_data = load_cv_data(
+            base_file=Path(args.base_file),
+            publications_file=Path(args.publications_file),
+        )
+        cv_data["conference_presentations"] = [
+            normalize_publication_like_entry(record, "conference_presentations")
+            for record in (cv_data.get("conference_presentations") or [])
+        ]
     config = build_sync_config(args, cv_data)
     hal_records, orcid_records = gather_upstream_records(config)
     updated_data, report = sync_publications(
@@ -854,12 +880,19 @@ def main(argv: list[str] | None = None) -> int:
             "# cv.synced.yaml — Generated by sync_publications_hal.py\n"
             "#\n"
             "# This file is GENERATED. Do not edit it manually.\n"
-            "# Edit data/cv.yaml (the canonical source) instead, then re-run sync.\n"
+            "# Edit your canonical publication data instead, then re-run sync.\n"
             "# ==============================================================================\n"
         )
-        is_canonical = config.output_file.resolve() == config.cv_file.resolve()
+        publication_output = publication_payload_from_cv(updated_data)
+        split_canonical = config.output_file.resolve() == config.publications_file.resolve()
+        legacy_canonical = config.cv_file is not None and config.output_file.resolve() == config.cv_file.resolve()
+        is_canonical = split_canonical or legacy_canonical
         header = None if is_canonical else synced_header
-        save_yaml(config.output_file, updated_data, header=header)
+        save_yaml(
+            config.output_file,
+            updated_data if legacy_canonical else publication_output,
+            header=header,
+        )
         if config.report_file:
             config.report_file.parent.mkdir(parents=True, exist_ok=True)
             config.report_file.write_text(report_text, encoding="utf-8")

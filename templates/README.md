@@ -1,7 +1,8 @@
 # Template files
 
 This directory contains the Jinja2 template and the moderncv LaTeX class/style files used to
-generate the CV from `data/cv.yaml`.
+generate the CV from split YAML data (`data/cv.base.yaml` + `data/publications.yaml`)
+or, for legacy compatibility, from `data/cv.yaml`.
 
 ## Files
 
