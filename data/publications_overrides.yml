@@ -1,0 +1,9 @@
+# Optional HAL/DOI publication classification overrides.
+# Keys should be stable identifiers, preferably HAL ids.
+#
+# Example:
+# hal:hal-01234567:
+#   category: conference_posters
+# doi:10.1234/example.doi:
+#   category: journal_articles
+{}

@@ -363,6 +363,83 @@ class HalBackfillTests(unittest.TestCase):
         self.assertIn("Test paper", conflict_titles)
 
 
+class HalClassificationTests(unittest.TestCase):
+    def test_hal_article_stays_journal_article(self):
+        record = sync_publications_hal.normalize_hal_record(
+            {
+                "docType_s": "ART",
+                "title_s": ["Journal publication"],
+                "journalTitle_s": "Journal of Testing",
+                "halId_s": "hal-art-1",
+            }
+        )
+        self.assertEqual(record["section"], "journal_articles")
+        self.assertEqual(record["publication_type"], "journal-article")
+
+    def test_hal_french_poster_is_not_journal_article(self):
+        record = sync_publications_hal.normalize_hal_record(
+            {
+                "docType_s": "COMM",
+                "subType_s": "Affiche",
+                "title_s": ["Développer un protocole d'entraînement pour réaliser des IRMf sans anesthésie et sans contrainte avec des agneaux"],
+                "conferenceTitle_s": "Congrès test",
+                "halId_s": "hal-poster-1",
+            }
+        )
+        self.assertEqual(record["section"], "under_review_or_in_prep")
+        self.assertEqual(record["publication_type"], "conference-poster")
+
+    def test_hal_unknown_type_falls_back_conservatively(self):
+        record = sync_publications_hal.normalize_hal_record(
+            {
+                "docType_s": "UNDEFINED",
+                "title_s": ["Unknown publication kind"],
+                "halId_s": "hal-unknown-1",
+            }
+        )
+        self.assertEqual(record["section"], "under_review_or_in_prep")
+        self.assertEqual(record["publication_type"], "other")
+
+    def test_hal_override_applies_after_auto_classification(self):
+        cv_data = {
+            "publication_sync": {"manual_overrides": []},
+            "publications": {"journal_articles": [], "book_chapters": [], "under_review_or_in_prep": []},
+        }
+        hal_record = sync_publications_hal.normalize_hal_record(
+            {
+                "docType_s": "ART",
+                "title_s": ["Auto classified as journal"],
+                "journalTitle_s": "Journal of Testing",
+                "halId_s": "hal-override-1",
+            }
+        )
+
+        updated, report = sync_publications_hal.sync_publications(
+            copy.deepcopy(cv_data),
+            hal_records=[hal_record],
+            publication_overrides={"hal:hal-override-1": "conference_posters"},
+            synced_on="2026-08-11",
+        )
+        self.assertEqual(len(updated["publications"]["journal_articles"]), 0)
+        self.assertEqual(len(updated["publications"]["under_review_or_in_prep"]), 1)
+        overridden = updated["publications"]["under_review_or_in_prep"][0]
+        self.assertEqual(overridden["publication_type"], "conference-poster")
+        self.assertEqual(len(report["applied_overrides"]), 1)
+
+    def test_unknown_override_category_is_warned_and_ignored(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            overrides_file = Path(tmp_dir) / "publications_overrides.yml"
+            overrides_file.write_text(
+                "hal:hal-override-1:\n"
+                "  category: made_up_category\n",
+                encoding="utf-8",
+            )
+            overrides, warnings = sync_publications_hal.load_publication_overrides(overrides_file)
+        self.assertEqual(overrides, {})
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("unknown override category", warnings[0]["message"])
+
+
 class PreprintDedupTests(unittest.TestCase):
     """Tests for D: Preprint vs published dedup/classification."""
 
