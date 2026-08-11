@@ -188,6 +188,7 @@ def extract_personal(lines: list) -> dict:
         "title": "",
         "email": "",
         "orcid": "",
+        "id_hal": "",
         "photo": "",
         "homepage": "",
         "mobile": "",
@@ -206,10 +207,13 @@ def extract_personal(lines: list) -> dict:
         m = re.match(r"\\email\{([^}]*)\}", line)
         if m:
             personal["email"] = m.group(1).strip()
-        # ORCID may be in a commented \extrainfo line
-        m = re.match(r"%?\\extrainfo\{ORCID:\s*(?:orcid\.org/)?([\d-]+)\}", line)
+        # ORCID / HAL may be in a commented \extrainfo line
+        m = re.search(r"ORCID:\s*(?:orcid\.org/)?([\d-]+)", line)
         if m:
             personal["orcid"] = m.group(1).strip()
+        m = re.search(r"HAL:\s*(?:hal\.science/)?([A-Za-z0-9-]+)", line)
+        if m:
+            personal["id_hal"] = m.group(1).strip()
         m = re.match(r"\\photo\[.*?\]\[.*?\]\{([^}]*)\}", line)
         if m:
             personal["photo"] = m.group(1).strip()
@@ -677,6 +681,7 @@ def serialise_personal(p: dict) -> str:
         f"  title: {yaml_str(p['title'])}\n"
         f"  email: {p['email'] or empty}\n"
         f"  orcid: {yaml_str(p['orcid']) if p['orcid'] else empty}  # manual\n"
+        f"  id_hal: {yaml_str(p['id_hal']) if p['id_hal'] else empty}  # manual\n"
         f"  photo: {p['photo'] or empty}\n"
         f"  homepage: {yaml_str(p['homepage']) if p['homepage'] else empty}\n"
         f"  mobile: {yaml_str(p['mobile']) if p['mobile'] else empty}\n"
@@ -892,13 +897,11 @@ cv:
 
 # Publication sync configuration
 publication_sync:
+  # Local YAML data stays canonical; sync sources are upstream providers only.
+  source_mode: hal_plus_orcid  # hal_only | orcid_only | hal_plus_orcid
   sources:
-    orcid: true
-    openalex: true
-    crossref: true
     hal: true
-    pubmed: false
-    scholar: false
+    orcid: true
   # Publications whose DOI or title matches an entry here are treated as
   # 'manual' and will never be overwritten by the sync scripts.
   manual_overrides: []

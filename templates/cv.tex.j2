@@ -32,7 +32,7 @@
 {% if p.email %}\email{ {{- p.email -}} }{% endif %}
 {% if p.mobile %}\mobile{ {{- p.mobile | escape_latex -}} }{% endif %}
 {% if p.homepage %}\homepage{ {{- p.homepage -}} }{ {{- p.homepage -}} }{% endif %}
-{% if p.orcid %}\extrainfo{ORCID: orcid.org/{{ p.orcid }}}{% endif %}
+{% if p.orcid or p.id_hal %}\extrainfo{ {% if p.orcid %}ORCID: orcid.org/{{ p.orcid }}{% endif %}{% if p.orcid and p.id_hal %} \enspace|\enspace {% endif %}{% if p.id_hal %}HAL: hal.science/{{ p.id_hal }}{% endif %} }{% endif %}
 {% if p.photo %}\photo[70pt][0.4pt]{ {{- p.photo -}} }{% endif %}
 
 %-------------------------------------------------------------------
