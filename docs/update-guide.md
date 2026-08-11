@@ -137,7 +137,66 @@ After merging, the sync script detects records in `journal_articles` whose
 This prevents a Zenodo preprint from appearing as a duplicate journal article.
 The sync report includes a **Deduped preprints** section listing all such actions.
 
-## Good next automation steps
+## Funding section
+
+Funding entries are stored under the `funding` key as a list:
+
+```yaml
+funding:
+  - years: "2021 - 2024"
+    description: >-
+      ANR JCJC – (SheepVoicefMRI) Neuroimagerie fonctionnelle des mécanismes
+      de la perception des voix chez le mouton. 200k€. Coordination : S. Love.
+  - years: "2024 - 2026"
+    description: >-
+      American NIH - Towards High-Resolution Neuro-Behavioral Quantification …
+```
+
+This section is extracted from `\section{Funding}` in the seed LaTeX.  Multi-line
+`\cvitem` entries are joined automatically during extraction.
+
+## Section ordering
+
+The order in which sections appear in the generated CV is controlled by
+`cv.section_order` in `data/cv.yaml`:
+
+```yaml
+cv:
+  section_order:
+    - education
+    - professional_experience
+    - funding
+    - honors_awards
+    - skills
+    - languages
+    - publications
+    - conference_presentations
+```
+
+Supported section keys: `education`, `professional_experience`, `funding`,
+`honors_awards`, `skills`, `languages`, `publications`,
+`conference_presentations`.
+
+If `section_order` is absent the default order above is used (backward
+compatible with existing `cv.yaml` files that predate this key).
+
+To reorder, simply rearrange the list.  To hide a section, remove it from the
+list.
+
+## Reverse publication numbering
+
+Set `cv.pub_reverse_numbering: true` to display the highest number next to the
+most recent publication (matching common academic CV conventions):
+
+```yaml
+cv:
+  pub_reverse_numbering: true   # newest entry gets the highest label
+```
+
+Applies to journal articles, book chapters, under-review items, and conference
+presentations.  Default is `false` (chronological forward numbering).
+
+
 - structured CV schema
 - LaTeX generator
 - publication import from ORCID / HAL / OpenAlex

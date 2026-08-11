@@ -579,11 +579,13 @@ def _build_pub_stub(raw_text: str, impact_factor, quartile: str,
     )
 
     # Title is the text from the start of remainder up to the first «
-    # (journal marker) or the first sentence boundary.
+    # (journal marker) or the first sentence boundary.  Preserve the
+    # trailing period so the rendered citation reads "Title. Journal …"
+    # rather than "Title Journal …".
     title = ""
     m_title = re.match(r"^([^.]+(?:\([^)]*\)[^.]*)?\.?)", remainder)
     if m_title:
-        title = m_title.group(1).rstrip(". ")
+        title = m_title.group(1).rstrip(" ")
 
     # If title ends with the journal name (no marker was found), strip it
     # — leave it blank and let the user fill it in.
@@ -614,9 +616,73 @@ def _build_pub_stub(raw_text: str, impact_factor, quartile: str,
     return stub
 
 
+def join_multiline_entries(lines: list) -> list:
+    """Join continuation lines onto the preceding LaTeX command line.
+
+    A continuation line is any non-blank line that does not start with a
+    LaTeX backslash command or a comment character.  This handles cvitem
+    entries whose description spans multiple source lines.
+    """
+    joined = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("%"):
+            if joined:
+                joined.append(line)
+            continue
+        if stripped.startswith("\\"):
+            joined.append(line)
+        else:
+            if joined:
+                joined[-1] = joined[-1].rstrip() + " " + stripped
+            else:
+                joined.append(line)
+    return joined
+
+
+def _parse_conference_tail(tail: str):
+    """Extract presentation type, venue, location, and date from the
+    trailing portion of a conference citation string.
+
+    Handles patterns such as:
+      "Poster at Conference Name, City, Month DD-DD"
+      "Oral presentation at Conference Name, City, Date"
+    Returns (ptype, venue, location, date).
+    """
+    tail = tail.strip().rstrip(".")
+    if not tail:
+        return "poster", "", "", ""
+
+    # Search for a known type keyword optionally followed by "at <venue…>"
+    m = re.search(
+        r"(poster|talk|oral\s+presentation|invited\s+(?:talk|lecture))"
+        r"(?:\s+at\s+(.+))?$",
+        tail, re.IGNORECASE,
+    )
+    if m:
+        ptype_raw = m.group(1).strip().lower()
+        ptype = "oral" if ("oral" in ptype_raw or "invited" in ptype_raw) else ptype_raw.split()[0]
+        venue_tail = (m.group(2) or "").strip().rstrip(".")
+    else:
+        ptype = "poster"
+        venue_tail = tail
+
+    # Heuristic split: rightmost two commas → location, date
+    parts = [p.strip() for p in venue_tail.rsplit(",", 2)]
+    if len(parts) >= 3:
+        venue, location, date = parts[0], parts[1], parts[2]
+    elif len(parts) == 2:
+        venue, location, date = parts[0], parts[1], ""
+    else:
+        venue, location, date = venue_tail, "", ""
+
+    return ptype, venue, location, date
+
+
 def extract_conference_presentations(lines: list) -> list:
     """Parse the Conference Presentations section."""
     conf_lines = extract_section_lines(lines, "Conference Presentations")
+    conf_lines = join_multiline_entries(conf_lines)
     presentations = []
 
     for line in conf_lines:
@@ -630,28 +696,49 @@ def extract_conference_presentations(lines: list) -> list:
         raw_text = m_item.group(2)
         citation = clean_latex(raw_text)
 
-        # Detect presentation type
-        ptype = "poster"
-        if re.search(r"oral presentation", citation, re.IGNORECASE):
-            ptype = "oral"
-
         authors, year, remainder = _parse_authors_year(citation)
+
         title = ""
+        after_title = ""
         m_title = re.match(r"^([^.]+(?:\([^)]*\)[^.]*)?\.)", remainder)
         if m_title:
             title = m_title.group(1).rstrip(".")
+            after_title = remainder[m_title.end():].strip()
+        else:
+            after_title = remainder
+
+        ptype, venue, location, date = _parse_conference_tail(after_title)
 
         presentations.append({
             "index": index,
             "authors": authors,
             "year": int(year) if year else "",
             "title": title,
-            "venue": "",   # hard to parse reliably; populate manually
-            "location": "",
-            "date": "",
             "type": ptype,
+            "venue": venue,
+            "location": location,
+            "date": date,
         })
     return presentations
+
+
+def extract_funding(lines: list) -> list:
+    """Parse the Funding section.
+
+    Each entry is a \\cvitem{year_range}{description} where the description
+    may span multiple lines in the LaTeX source.
+    """
+    fund_lines = extract_section_lines(lines, "Funding")
+    fund_lines = join_multiline_entries(fund_lines)
+    grants = []
+    for line in fund_lines:
+        line_s = line.strip()
+        if not line_s or line_s.startswith("%"):
+            continue
+        item = parse_cvitem(line_s)
+        if item:
+            grants.append({"years": item[0], "description": item[1]})
+    return grants
 
 
 # ---------------------------------------------------------------------------
@@ -868,6 +955,18 @@ def serialise_awards(awards: list) -> str:
     return "\n".join(out) + "\n"
 
 
+def serialise_funding(grants: list) -> str:
+    if not grants:
+        return "funding: []\n"
+    out = ["funding:"]
+    for g in grants:
+        out.append(f"  - years: {yaml_str(g['years'])}")
+        desc = g.get("description", "")
+        out.append(f"    description: {yaml_block_str(desc, base_indent=4)}")
+        out.append("")
+    return "\n".join(out) + "\n"
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -896,6 +995,22 @@ cv:
     style: "casual"
     color: "blue"
   generated_from: "overleaf_seed"
+  # Section rendering order.  Remove, reorder, or add keys to customise the
+  # layout.  Supported keys:
+  #   education, professional_experience, funding, honors_awards, skills,
+  #   languages, publications, conference_presentations
+  section_order:
+    - education
+    - professional_experience
+    - funding
+    - honors_awards
+    - skills
+    - languages
+    - publications
+    - conference_presentations
+  # Set to true to number publications with the highest number first
+  # (reverse chronological display order).
+  pub_reverse_numbering: false
 
 # Publication sync configuration
 publication_sync:
@@ -914,7 +1029,8 @@ SECTION_SEPARATOR = "\n# {line}\n# {title}\n# {line}\n".format
 
 
 def build_yaml(personal, education, experience, publications,
-               conference_presentations, skills, languages, awards) -> str:
+               conference_presentations, skills, languages, awards,
+               funding) -> str:
     parts = [HEADER]
 
     parts.append(
@@ -933,6 +1049,11 @@ def build_yaml(personal, education, experience, publications,
         SECTION_SEPARATOR(line="-" * 78, title="PROFESSIONAL EXPERIENCE") + "\n"
     )
     parts.append(serialise_experience(experience) + "\n")
+
+    parts.append(
+        SECTION_SEPARATOR(line="-" * 78, title="FUNDING") + "\n"
+    )
+    parts.append(serialise_funding(funding) + "\n")
 
     parts.append(
         SECTION_SEPARATOR(line="-" * 78, title="PUBLICATIONS") + "\n"
@@ -1013,6 +1134,7 @@ def main():
     skills = extract_skills(lines)
     languages = extract_languages(lines)
     awards = extract_awards(lines)
+    funding = extract_funding(lines)
 
     # ---- Report ----
     print("Extraction summary:")
@@ -1025,6 +1147,7 @@ def main():
     report("Book chapters", len(publications.get("book_chapters", [])))
     report("Under review / in prep", len(publications.get("under_review_or_in_prep", [])))
     report("Conference presentations", len(conference_presentations))
+    report("Funding entries", len(funding))
     report("Skill categories", len(skills))
     report("Languages", len(languages))
     report("Honors & awards", len(awards))
@@ -1033,7 +1156,7 @@ def main():
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     yaml_content = build_yaml(
         personal, education, experience, publications,
-        conference_presentations, skills, languages, awards
+        conference_presentations, skills, languages, awards, funding
     )
 
     with open(output_path, "w", encoding="utf-8") as fh:

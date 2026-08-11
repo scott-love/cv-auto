@@ -119,6 +119,7 @@ def print_summary(data: dict, output: Path) -> None:
     chapter_n = len(pubs.get("book_chapters", []) or [])
     review_n = len(pubs.get("under_review_or_in_prep", []) or [])
     conf_n = len(data.get("conference_presentations", []) or [])
+    funding_n = len(data.get("funding", []) or [])
 
     edu_n = len(data.get("education", []) or [])
     exp = data.get("experience", {})
@@ -134,6 +135,7 @@ def print_summary(data: dict, output: Path) -> None:
     print(f"  Education entries       : {edu_n}")
     print(f"  Research positions      : {research_n}")
     print(f"  Teaching positions      : {teaching_n}")
+    print(f"  Funding entries         : {funding_n}")
     print(f"  Honors & Awards         : {awards_n}")
     print(f"  Skill categories        : {skills_n}")
     print(f"  Languages               : {lang_n}")
@@ -182,6 +184,10 @@ def main(argv=None):
 
     print(f"Loading  : {input_path}")
     data = load_yaml(input_path)
+
+    # Backward-compatibility: ensure keys added in later schema versions exist.
+    data.setdefault("funding", [])
+    data.setdefault("conference_presentations", [])
 
     print(f"Template : {template_path}")
     latex = render_template(template_path, data)

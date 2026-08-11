@@ -9,6 +9,21 @@
 
 {% set p = personal %}
 {% set theme = cv.theme %}
+{# Section ordering: falls back to a sensible default when section_order is
+   absent from cv.yaml (backward compatibility). #}
+{% set default_section_order = [
+     'education',
+     'professional_experience',
+     'funding',
+     'honors_awards',
+     'skills',
+     'languages',
+     'publications',
+     'conference_presentations',
+   ] %}
+{% set section_order = cv.get('section_order', default_section_order) %}
+{# Reverse-number publications when pub_reverse_numbering: true #}
+{% set pub_reverse = cv.get('pub_reverse_numbering', false) %}
 
 %-------------------------------------------------------------------
 %  DOCUMENT CLASS & THEME
@@ -41,6 +56,30 @@
 
 \makecvtitle
 
+{# ---------------------------------------------------------------- #}
+{# Helper macro: render an author list, bolding the target author.  #}
+{# Only the first token (Surname) is matched to avoid false-bolding  #}
+{# adjacent names that share text with the target surname.           #}
+{# ---------------------------------------------------------------- #}
+{%- macro render_authors(authors) -%}
+  {%- for a in authors -%}
+    {%- if a[:5] == "Love," or a[:5] == "Love " -%}
+      \textbf{ {{- a -}} }
+    {%- else -%}
+      {{- a -}}
+    {%- endif -%}
+    {%- if not loop.last -%}, {% endif -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{# ================================================================ #}
+{# SECTION LOOP — rendered in section_order                         #}
+{# ================================================================ #}
+
+{% for sec in section_order %}
+
+{# ---------------------------------------------------------------- #}
+{% if sec == 'education' %}
 %-------------------------------------------------------------------
 %  EDUCATION
 %-------------------------------------------------------------------
@@ -55,6 +94,8 @@
 
 {% endfor %}
 
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'professional_experience' %}
 %-------------------------------------------------------------------
 %  PROFESSIONAL EXPERIENCE
 %-------------------------------------------------------------------
@@ -86,10 +127,25 @@
 {% endfor %}
 {% endif %}
 
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'funding' %}
+{% if funding %}
+%-------------------------------------------------------------------
+%  FUNDING
+%-------------------------------------------------------------------
+\section{Funding}
+
+{% for grant in funding -%}
+\cvitem{ {{- grant.years | escape_latex -}} }{ {{- grant.description | escape_latex -}} }
+{% endfor %}
+{% endif %}
+
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'honors_awards' %}
+{% if honors_awards %}
 %-------------------------------------------------------------------
 %  HONORS & AWARDS
 %-------------------------------------------------------------------
-{% if honors_awards %}
 \section{Honors \& Awards}
 
 {% for award in honors_awards -%}
@@ -97,10 +153,12 @@
 {% endfor %}
 {% endif %}
 
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'skills' %}
+{% if skills %}
 %-------------------------------------------------------------------
 %  SKILLS
 %-------------------------------------------------------------------
-{% if skills %}
 \section{Skills}
 
 {% for key, skill in skills.items() -%}
@@ -108,10 +166,12 @@
 {% endfor %}
 {% endif %}
 
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'languages' %}
+{% if languages %}
 %-------------------------------------------------------------------
 %  LANGUAGES
 %-------------------------------------------------------------------
-{% if languages %}
 \section{Languages}
 
 {% for lang in languages -%}
@@ -119,28 +179,19 @@
 {% endfor %}
 {% endif %}
 
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'publications' %}
 %-------------------------------------------------------------------
 %  PUBLICATIONS
 %-------------------------------------------------------------------
 \section{Publications}
 
-{# ---- helper macro: render an author list, bolding Love's name ---- #}
-{%- macro render_authors(authors) -%}
-  {%- for a in authors -%}
-    {%- if "Love" in a -%}
-      \textbf{ {{- a -}} }
-    {%- else -%}
-      {{- a -}}
-    {%- endif -%}
-    {%- if not loop.last -%}, {% endif -%}
-  {%- endfor -%}
-{%- endmacro -%}
-
 {% if publications.journal_articles %}
 \subsection{Peer-reviewed articles}
 
 {% for pub in publications.journal_articles -%}
-\cvitem{}{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
+{%- set idx = loop.revindex if pub_reverse else "" -%}
+\cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -148,7 +199,7 @@
 \subsection{Book chapters}
 
 {% for pub in publications.book_chapters -%}
-{%- set idx = loop.index -%}
+{%- set idx = loop.revindex if pub_reverse else loop.index -%}
 \cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }}{% if pub.editors %}, in: {{ pub.editors | join(", ") }} (Eds.){% endif %}, \textit{ {{- pub.book | escape_latex -}} }{% if pub.publisher %}, {{ pub.publisher | escape_latex }}{% endif %}}
 {% endfor %}
 {% endif %}
@@ -157,7 +208,7 @@
 \subsection{Under review or in preparation}
 
 {% for pub in publications.under_review_or_in_prep -%}
-{%- set idx = loop.index -%}
+{%- set idx = loop.revindex if pub_reverse else loop.index -%}
 {%- if pub.authors and pub.authors | length > 0 -%}
   {%- set author_str = render_authors(pub.authors) -%}
 {%- else -%}
@@ -167,16 +218,21 @@
 {% endfor %}
 {% endif %}
 
+{# ---------------------------------------------------------------- #}
+{% elif sec == 'conference_presentations' %}
+{% if conference_presentations %}
 %-------------------------------------------------------------------
 %  CONFERENCE PRESENTATIONS
 %-------------------------------------------------------------------
-{% if conference_presentations %}
 \section{Conference Presentations}
 
 {% for pres in conference_presentations -%}
-{%- set idx = loop.index -%}
+{%- set idx = loop.revindex if pub_reverse else loop.index -%}
 \cvitem{ {{- idx -}} }{ {{- render_authors(pres.authors) }} {{ pres.year }}. {{ pres.title | escape_latex }}.{% if pres.venue %} {{ pres.type | title }} at {{ pres.venue | escape_latex }}{% if pres.location %}, {{ pres.location | escape_latex }}{% endif %}{% if pres.date %}, {{ pres.date }}{% endif %}{% else %} {{ pres.type | title }}{% endif %}}
 {% endfor %}
 {% endif %}
+
+{% endif %}
+{% endfor %}
 
 \end{document}
