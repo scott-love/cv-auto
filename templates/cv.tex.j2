@@ -16,7 +16,6 @@
      'professional_experience',
      'funding',
      'honors_awards',
-     'skills',
      'languages',
      'publications',
      'conference_presentations',
@@ -154,19 +153,6 @@
 {% endif %}
 
 {# ---------------------------------------------------------------- #}
-{% elif sec == 'skills' %}
-{% if skills %}
-%-------------------------------------------------------------------
-%  SKILLS
-%-------------------------------------------------------------------
-\section{Skills}
-
-{% for key, skill in skills.items() -%}
-\cvitem{ {{- skill.label | escape_latex -}} }{ {{- skill.tools | join(", ") | escape_latex -}} }
-{% endfor %}
-{% endif %}
-
-{# ---------------------------------------------------------------- #}
 {% elif sec == 'languages' %}
 {% if languages %}
 %-------------------------------------------------------------------
@@ -190,8 +176,7 @@
 \subsection{Peer-reviewed articles}
 
 {% for pub in publications.journal_articles -%}
-{%- set idx = loop.revindex if pub_reverse else "" -%}
-\cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
+\cvitem{ {{- pub.index -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }} \textit{ {{- pub.journal | escape_latex -}} }{% if pub.volume %} {{ pub.volume }}{% endif %}{% if pub.pages %}, {{ pub.pages }}{% endif %}{% if pub.doi %} \url{ {{- pub.doi -}} }{% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -199,8 +184,7 @@
 \subsection{Book chapters}
 
 {% for pub in publications.book_chapters -%}
-{%- set idx = loop.revindex if pub_reverse else loop.index -%}
-\cvitem{ {{- idx -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }}{% if pub.editors %}, in: {{ pub.editors | join(", ") }} (Eds.){% endif %}, \textit{ {{- pub.book | escape_latex -}} }{% if pub.publisher %}, {{ pub.publisher | escape_latex }}{% endif %}}
+\cvitem{ {{- pub.index -}} }{ {{- render_authors(pub.authors) }} {{ pub.year }}. {{ pub.title | escape_latex }}{% if pub.editors %}, in: {{ pub.editors | join(", ") }} (Eds.){% endif %}, \textit{ {{- pub.book | escape_latex -}} }{% if pub.publisher %}, {{ pub.publisher | escape_latex }}{% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -208,13 +192,12 @@
 \subsection{Under review or in preparation}
 
 {% for pub in publications.under_review_or_in_prep -%}
-{%- set idx = loop.revindex if pub_reverse else loop.index -%}
 {%- if pub.authors and pub.authors | length > 0 -%}
   {%- set author_str = render_authors(pub.authors) -%}
 {%- else -%}
   {%- set author_str = pub.title -%}
 {%- endif -%}
-\cvitem{ {{- idx -}} }{ {{- author_str -}}{% if pub.authors and pub.authors | length > 0 and pub.year %} ({{ pub.year }}){% endif %}{% if pub.authors and pub.authors | length > 0 and pub.title %}. {{ pub.title | escape_latex }}{% endif %}{% if pub.journal %} \textit{ {{- pub.journal | escape_latex -}} }{% endif %}{% if pub.status %} ({{ pub.status | escape_latex }}){% endif %}}
+\cvitem{ {{- pub.index -}} }{ {{- author_str -}}{% if pub.authors and pub.authors | length > 0 and pub.year %} ({{ pub.year }}){% endif %}{% if pub.authors and pub.authors | length > 0 and pub.title %}. {{ pub.title | escape_latex }}{% endif %}{% if pub.journal %} \textit{ {{- pub.journal | escape_latex -}} }{% endif %}{% if pub.status %} ({{ pub.status | escape_latex }}){% endif %}}
 {% endfor %}
 {% endif %}
 
@@ -227,8 +210,7 @@
 \section{Conference Presentations}
 
 {% for pres in conference_presentations -%}
-{%- set idx = loop.revindex if pub_reverse else loop.index -%}
-\cvitem{ {{- idx -}} }{ {{- render_authors(pres.authors) }} {{ pres.year }}. {{ pres.title | escape_latex }}.{% if pres.venue %} {{ pres.type | title }} at {{ pres.venue | escape_latex }}{% if pres.location %}, {{ pres.location | escape_latex }}{% endif %}{% if pres.date %}, {{ pres.date }}{% endif %}{% else %} {{ pres.type | title }}{% endif %}}
+\cvitem{ {{- pres.index -}} }{ {{- render_authors(pres.authors) }} {{ pres.year }}. {{ pres.title | escape_latex }}.{% if pres.venue %} {{ pres.type | title }} at {{ pres.venue | escape_latex }}{% if pres.location %}, {{ pres.location | escape_latex }}{% endif %}{% if pres.date %}, {{ pres.date }}{% endif %}{% else %} {{ pres.type | title }}{% endif %}}
 {% endfor %}
 {% endif %}
 

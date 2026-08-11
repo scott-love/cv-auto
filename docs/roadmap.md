@@ -60,7 +60,6 @@ Use a structured format that is easy to edit manually:
 - professional experience
 - teaching
 - honors and awards
-- skills
 - languages
 - publications
 - conference presentations

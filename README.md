@@ -1,119 +1,71 @@
-# cv-auto: Semi-automatic Academic CV Workflow
+# cv-auto: semi-automatic academic CV workflow
 
-A free, maintainable workflow for keeping an academic CV up-to-date using **structured data** and **publication sync** from public repositories.
+This repository keeps CV data in simple YAML and renders it to LaTeX.
 
-## Overview
+## Current source-of-truth layout
 
-This project helps you:
-
-- ✅ **Start from an existing Overleaf/LaTeX CV** (or any moderncv LaTeX source)
-- ✅ **Extract CV content once** into structured YAML data
-- ✅ **Keep the CV easy to update** by editing canonical YAML data
-- ✅ **Automatically sync publications** from HAL and ORCID
-- ✅ **Generate a fresh LaTeX CV** whenever you want
-- ✅ **Avoid vendor lock-in** — everything is free, open, and reproducible
-
-## Repository Structure
-
-```
-cv-auto/
-├── data/
-│   ├── cv.yaml              ← Your canonical CV data (hand-edited or auto-generated)
-│   └── README.md            ← Data format guide
-├── scripts/
-│   ├── extract_from_latex.py    ← Parse LaTeX → YAML (Phase 1)
-│   ├── generate_latex.py        ← Render YAML → LaTeX (Phase 2)
-│   ├── sync_publications_hal.py ← Auto-import publications from HAL/ORCID (Phase 3)
-│   └── README.md
-├── templates/
-│   ├── cv.tex.j2           ← Jinja2 template for CV
-│   ├── moderncv.cls        ← moderncv LaTeX class
-│   ├── moderncv*.sty       ← Color and style packages
-│   └── README.md
-├── source-material/
-│   ├── cv_7.tex            ← Your original Overleaf LaTeX source
-│   ├── pictures/           ← Photo for CV
-│   └── *.sty, *.cls        ← Moderncv support files
-├── build/
-│   └── cv.tex              ← Generated LaTeX (not committed)
-├── docs/
-│   └── UPDATE_GUIDE.md     ← Detailed update instructions
-└── README.md               ← This file
+```text
+data/
+├── cv.base.yaml        # manual canonical CV data (no publications)
+├── publications.yaml   # publication-like data managed by sync/manual overrides
+└── cv.yaml             # legacy combined file kept for compatibility/migration
 ```
 
-## Workflow at a Glance
+- `data/cv.base.yaml` is the long-term manual source of truth.
+- `data/publications.yaml` stores:
+  - `publications.journal_articles`
+  - `publications.book_chapters`
+  - `publications.under_review_or_in_prep`
+  - `conference_presentations`
+- Overleaf/LaTeX input is a **one-time seed**, not an ongoing source of truth.
 
-```
-Overleaf/source-material/cv_7.tex
-          ↓
-    [Phase 1: Extract]
-          ↓
-    data/cv.yaml ← Edit here manually, or regenerate from LaTeX
-          ↓
-    [Phase 2: Generate]
-          ↓
-    build/cv.tex → Compile to PDF
-          ↓
-    build/cv.pdf
-```
+## Publication record model
 
-**Optional Phase 3: Publication Sync**
+All publication-like entries support:
 
-```
-HAL API / ORCID API
-          ↓
-    [sync_publications_hal.py]
-          ↓
-    data/cv.synced.yaml  ← merged output (generated, do not edit)
-    data/cv.yaml         ← canonical source, never overwritten automatically
+```yaml
+sync: auto    # or manual
+index: 1
 ```
 
----
+Conference presentations now use the same `sync` / `index` shape as the other
+publication categories.
 
-## Quick Start
+Indices are assigned centrally by repository scripts using deterministic
+chronological ordering from `year`, then `date` when present, with stable text
+fallbacks.
 
-### Prerequisites
+## Common commands
 
-```bash
-pip install jinja2 pyyaml requests
-```
-
-(LaTeX distribution optional, but needed to compile PDF)
-
-### 1. Extract from your LaTeX CV
-
-If you have an existing Overleaf CV (moderncv format), parse it once:
-
-```bash
-python scripts/extract_from_latex.py \
-  --input source-material/cv_7.tex \
-  --output data/cv.yaml
-```
-
-**Output:**
-- `data/cv.yaml` — structured, editable CV data
-- Console summary of what was extracted
-
-### 2. Generate LaTeX from your data
-
-Whenever you update `data/cv.yaml`, regenerate the LaTeX:
+### Generate LaTeX from split files
 
 ```bash
 python scripts/generate_latex.py \
-  --input data/cv.yaml \
+  --base-file data/cv.base.yaml \
+  --publications-file data/publications.yaml \
   --output build/cv.tex
 ```
 
-### 3. Compile to PDF (optional)
+If split files are absent, generation still falls back to legacy `data/cv.yaml`.
+
+### Sync publications
+
+Preview:
 
 ```bash
-cp templates/*.cls templates/*.sty build/
-cd build && pdflatex cv.tex
+python scripts/sync_publications_hal.py --dry-run
 ```
 
-This produces `build/cv.pdf`.
+Apply to the canonical publication file:
 
-### 4. Sync publications from HAL/ORCID (optional)
+```bash
+python scripts/sync_publications_hal.py \
+  --apply \
+  --publications-file data/publications.yaml \
+  --output-file data/publications.yaml
+```
+
+Optional legacy mixed-file mode still works:
 
 ```bash
 python scripts/sync_publications_hal.py \
@@ -121,263 +73,48 @@ python scripts/sync_publications_hal.py \
   --dry-run
 ```
 
-This script:
-- Uses `personal.id_hal` and `personal.orcid` by default
-- Treats HAL as the primary source for type/category and record quality
-- Lets ORCID fill missing metadata when enabled
-- Preserves any entries you marked as `sync: manual`
-- Prints a deterministic sync report before you apply changes
-
----
-
-## CV Data Format (`data/cv.yaml`)
-
-The CV data is organized into sections:
-
-```yaml
-personal:
-  firstname: Scott
-  familyname: "Love, PhD"
-  email: love.a.scott@gmail.com
-  orcid: "0000-0001-7416-9210"  # manual
-  id_hal: "scott-love"          # manual
-
-education:
-  - degree: "Ph.D. Psychology"
-    institution: "The University of Glasgow"
-    # ... more fields
-
-experience:
-  research:
-    - position: "Chargé de Recherche"
-      institution: "INRAE, CNRS, Université de Tours"
-      # ...
-  teaching:
-    - course: "Master 2 — Cognition, neurosciences et psychologie"
-      # ...
-
-publications:
-  journal_articles:
-    - sync: auto   # ← auto-updated by sync script
-      authors: [...]
-      year: 2024
-      title: "..."
-      journal: "..."
-      # ... more fields
-  book_chapters:
-    - sync: manual   # ← never overwritten
-      # ...
-```
-
-Publication subsections are expected to be lists. If a subsection is `null` or
-another type, `scripts/sync_publications_hal.py` now auto-recovers by treating
-it as empty and printing a deterministic data warning in the sync report.
-
-### Sync Markers
-
-- **`sync: auto`** — Entry may be updated by sync scripts. Use this for citations fetched from APIs.
-- **`sync: manual`** — Entry is hand-maintained. Sync scripts will never overwrite it.
-
-### Source of Truth Policy
-
-- `data/cv.yaml` is the long-term canonical source of truth.
-- HAL and ORCID are upstream providers used to suggest or merge publication metadata.
-- Manual/local values win over synced values, except HAL is preferred for publication type/category when sync updates an existing auto-managed record.
-
-See `data/README.md` for full field documentation.
-
----
-
-## Updating Your CV
-
-### **Option A: Edit `data/cv.yaml` directly**
-
-Edit the YAML file by hand, then regenerate:
+### Extract from a seed LaTeX CV
 
 ```bash
-python scripts/generate_latex.py
+python scripts/extract_from_latex.py \
+  --input source-material/cv_full_seed.tex \
+  --output-base data/cv.base.yaml \
+  --output-publications data/publications.yaml
 ```
 
-Good for:
-- Quick updates to personal info, experience, awards
-- Adding manual overrides to publications
-
-### **Option B: Update Overleaf, re-extract**
-
-Edit your original CV in Overleaf, download as `.tex`, then:
+Optional legacy combined export:
 
 ```bash
-python scripts/extract_from_latex.py
+python scripts/extract_from_latex.py \
+  --input source-material/cv_full_seed.tex \
+  --output data/cv.yaml
 ```
 
-Good for:
-- Refreshing from a seed LaTeX source when needed
-- Periodic bulk imports into structured data
-
-### **Option C: Sync publications, edit entries**
-
-Auto-import new publications, then refine manually:
+### Migrate an existing legacy `data/cv.yaml`
 
 ```bash
-python scripts/sync_publications_hal.py
+python scripts/migrate_split_data.py \
+  --input data/cv.yaml \
+  --base-file data/cv.base.yaml \
+  --publications-file data/publications.yaml
 ```
 
-Then edit `data/cv.yaml` as needed.
+## Manual override behavior
 
----
+- `sync: auto`: sync may update the record
+- `sync: manual`: sync must not overwrite the record
+- `publication_sync.manual_overrides` in `cv.base.yaml` can additionally protect
+  DOI/title matches
 
-## Configuration
+## Removed section
 
-### HAL Author ID
+The `skills` section has been removed from the data model, template rendering,
+generator summary output, and docs.
 
-Store your HAL author identifier in `data/cv.yaml`:
-```yaml
-personal:
-  id_hal: "scott-love"
-```
+## Validation
 
-Find your HAL author ID:
-1. Go to https://hal.archives-ouvertes.fr/
-2. Search for your name
-3. Click your profile
-4. Your ID is in the URL: `https://hal.archives-ouvertes.fr/search/index/?q=scott-love` → use `scott-love`
-
-Override it on the command line if needed:
-```bash
-python scripts/sync_publications_hal.py --hal-id "scott-love"
-```
-
-### ORCID
-
-Your ORCID remains optional and can stay in `data/cv.yaml`:
-```yaml
-personal:
-  orcid: "0000-0001-7416-9210"
-```
-
-### Source modes
-
-`publication_sync.source_mode` supports:
-
-- `hal_only`
-- `orcid_only`
-- `hal_plus_orcid` (default when both IDs are present)
-
-Examples:
+Run the focused test suite with:
 
 ```bash
-python scripts/sync_publications_hal.py --dry-run --source-mode hal_only
-python scripts/sync_publications_hal.py --dry-run --source-mode hal_plus_orcid
-# Apply: writes to data/cv.synced.yaml (does NOT overwrite data/cv.yaml)
-python scripts/sync_publications_hal.py --apply --report-file build/publication-sync-report.md
-# To overwrite the canonical file explicitly:
-python scripts/sync_publications_hal.py --apply --output-file data/cv.yaml
+python -m pytest tests/ -q
 ```
-
----
-
-## Advanced: Manual Publication Overrides
-
-To **prevent a publication from being updated** by sync scripts, mark it as `manual`:
-
-```yaml
-publications:
-  journal_articles:
-    - sync: manual   # ← Won't be overwritten
-      title: "My Paper"
-      # Your manual fields
-```
-
-To **never sync specific publications**, list their DOIs or titles in the YAML:
-
-```yaml
-publication_sync:
-  manual_overrides:
-    - doi: "10.1234/example"
-    - title: "A Paper I Want to Keep Exactly As Is"
-```
-
-Recommended workflow:
-1. Run the sync in `--dry-run` mode.
-2. Review the markdown/console report.
-3. Mark any locally curated entries as `sync: manual`.
-4. Re-run with `--apply` once the merge plan looks correct.
-
----
-
-## Troubleshooting
-
-### "ModuleNotFoundError: No module named 'jinja2'"
-
-Install dependencies:
-```bash
-pip install jinja2 pyyaml requests
-```
-
-### LaTeX extraction produced empty sections
-
-Check that your LaTeX uses `moderncv` syntax:
-- `\section{Education}`
-- `\cventry{dates}{title}{inst}{loc}{grade}{desc}`
-- `\cvitem{label}{text}`
-
-See `scripts/extract_from_latex.py` docstring for supported macros.
-
-### Publication sync fetched too many / too few results
-
-- Check your HAL author ID (should be lowercase with hyphens)
-- Check your ORCID is correct
-- Manually add/remove entries and mark them `sync: manual` if needed
-
----
-
-## Project Phases
-
-### Phase 1: Extraction ✅
-Extract CV content from LaTeX into structured YAML.
-
-**Status:** Complete  
-**Script:** `scripts/extract_from_latex.py`  
-**Output:** `data/cv.yaml`
-
-### Phase 2: Generation ✅
-Render YAML data into a fresh LaTeX CV using Jinja2.
-
-**Status:** Complete  
-**Script:** `scripts/generate_latex.py`  
-**Output:** `build/cv.tex`
-
-### Phase 3: Publication Sync 🚧
-Auto-sync publications from HAL and ORCID.
-
-**Status:** In progress  
-**Script:** `scripts/sync_publications_hal.py`  
-**Sources:** HAL (France), ORCID (global)
-
----
-
-## Design Philosophy
-
-✅ **Free & open** — No paid APIs, no vendor lock-in  
-✅ **Transparent** — Everything is YAML and plain Python  
-✅ **Reproducible** — Rebuild your CV anytime  
-✅ **Flexible** — Manual overrides for anything  
-✅ **Maintainable** — Update one place, regenerate everywhere  
-
----
-
-## License
-
-This project is provided as-is for personal use. The moderncv class and styles are licensed under the LPPL. See individual files for details.
-
----
-
-## Next Steps
-
-1. **Read** `docs/UPDATE_GUIDE.md` for detailed instructions
-2. **Edit** `data/cv.yaml` to customize your CV
-3. **Run** `python scripts/sync_publications_hal.py` to auto-import publications
-4. **Generate** `build/cv.tex` and compile to PDF
-5. **Commit** your changes to GitHub
-
-Happy CV-building! 🚀

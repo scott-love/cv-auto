@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-generate_latex.py — Render data/cv.yaml → build/cv.tex using Jinja2.
+generate_latex.py — Render split CV YAML data → build/cv.tex using Jinja2.
 
 Usage
 -----
@@ -8,7 +8,9 @@ Usage
 
 Options
 -------
-    --input    PATH   YAML data file       (default: data/cv.yaml)
+    --input    PATH   Legacy mixed YAML file (optional)
+    --base-file PATH  Base CV YAML file      (default: data/cv.base.yaml)
+    --publications-file PATH  Publications YAML file (default: data/publications.yaml)
     --template PATH   Jinja2 template file (default: templates/cv.tex.j2)
     --output   PATH   Output .tex file     (default: build/cv.tex)
     -h, --help        Show this help message
@@ -28,6 +30,10 @@ import argparse
 import sys
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
 # ---------------------------------------------------------------------------
 # Dependency check — give a friendly message if packages are missing
 # ---------------------------------------------------------------------------
@@ -45,23 +51,12 @@ except ImportError:
         "Error: Jinja2 is not installed.  Run:  pip install jinja2"
     )
 
+from cv_data import DEFAULT_BASE_FILE, DEFAULT_PUBLICATIONS_FILE, load_cv_data
+
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-def load_yaml(path: Path) -> dict:
-    """Load and parse a YAML file; raise with a clear message on failure."""
-    try:
-        with path.open(encoding="utf-8") as fh:
-            data = yaml.safe_load(fh)
-    except FileNotFoundError:
-        sys.exit(f"Error: YAML file not found: {path}")
-    except yaml.YAMLError as exc:
-        sys.exit(f"Error: Malformed YAML in {path}:\n{exc}")
-    if not isinstance(data, dict):
-        sys.exit(f"Error: Expected a mapping at the top level of {path}")
-    return data
 
 
 def escape_latex(text: str) -> str:
@@ -125,7 +120,6 @@ def print_summary(data: dict, output: Path) -> None:
     exp = data.get("experience", {})
     research_n = len(exp.get("research", []) or [])
     teaching_n = len(exp.get("teaching", []) or [])
-    skills_n = len(data.get("skills", {}) or {})
     lang_n = len(data.get("languages", []) or [])
     awards_n = len(data.get("honors_awards", []) or [])
 
@@ -137,7 +131,6 @@ def print_summary(data: dict, output: Path) -> None:
     print(f"  Teaching positions      : {teaching_n}")
     print(f"  Funding entries         : {funding_n}")
     print(f"  Honors & Awards         : {awards_n}")
-    print(f"  Skill categories        : {skills_n}")
     print(f"  Languages               : {lang_n}")
     print(f"  Journal articles        : {journal_n}")
     print(f"  Book chapters           : {chapter_n}")
@@ -161,8 +154,16 @@ def parse_args(argv=None):
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
-        "--input", default="data/cv.yaml", metavar="PATH",
-        help="Path to the YAML data file (default: data/cv.yaml)",
+        "--input", metavar="PATH",
+        help="Optional legacy mixed YAML file (for example data/cv.yaml)",
+    )
+    parser.add_argument(
+        "--base-file", default=str(DEFAULT_BASE_FILE), metavar="PATH",
+        help=f"Path to the base CV YAML file (default: {DEFAULT_BASE_FILE})",
+    )
+    parser.add_argument(
+        "--publications-file", default=str(DEFAULT_PUBLICATIONS_FILE), metavar="PATH",
+        help=f"Path to the publications YAML file (default: {DEFAULT_PUBLICATIONS_FILE})",
     )
     parser.add_argument(
         "--template", default="templates/cv.tex.j2", metavar="PATH",
@@ -178,16 +179,21 @@ def parse_args(argv=None):
 def main(argv=None):
     args = parse_args(argv)
 
-    input_path = Path(args.input)
+    input_path = Path(args.input) if args.input else None
+    base_path = Path(args.base_file)
+    publications_path = Path(args.publications_file)
     template_path = Path(args.template)
     output_path = Path(args.output)
 
-    print(f"Loading  : {input_path}")
-    data = load_yaml(input_path)
-
-    # Backward-compatibility: ensure keys added in later schema versions exist.
-    data.setdefault("funding", [])
-    data.setdefault("conference_presentations", [])
+    if input_path is not None:
+        print(f"Loading  : {input_path}")
+    else:
+        print(f"Loading  : {base_path} + {publications_path}")
+    data = load_cv_data(
+        input_path=input_path,
+        base_file=base_path,
+        publications_file=publications_path,
+    )
 
     print(f"Template : {template_path}")
     latex = render_template(template_path, data)

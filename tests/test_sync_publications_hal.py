@@ -541,6 +541,76 @@ class SyncOutputFileTests(unittest.TestCase):
             self.assertNotIn("# cv.synced.yaml", content)
 
 
+class SplitFileSyncTests(unittest.TestCase):
+    def test_apply_updates_publications_file_in_split_mode(self):
+        base_data = {
+            "cv": {"pub_reverse_numbering": False},
+            "personal": {"id_hal": "scott-love", "orcid": ""},
+            "publication_sync": {
+                "source_mode": "hal_only",
+                "sources": {"hal": True, "orcid": False},
+                "manual_overrides": [],
+            },
+        }
+        publications_data = {
+            "publications": {
+                "journal_articles": [],
+                "book_chapters": [],
+                "under_review_or_in_prep": [],
+            },
+            "conference_presentations": [
+                {
+                    "sync": "manual",
+                    "authors": ["Love, S."],
+                    "year": 2024,
+                    "title": "Existing talk",
+                    "venue": "Conference",
+                    "type": "oral",
+                }
+            ],
+        }
+        hal_fixture = [
+            normalized_record(
+                "journal_articles",
+                authors=["Love, Scott"],
+                year=2026,
+                title="Split mode paper",
+                journal="HAL Journal",
+                doi="10.1000/split",
+                publication_type="journal-article",
+                primary_source="hal",
+                source_ids={"hal": "hal-split"},
+            )
+        ]
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            base_file = Path(tmp_dir) / "cv.base.yaml"
+            publications_file = Path(tmp_dir) / "publications.yaml"
+            base_file.write_text(yaml.safe_dump(base_data, sort_keys=False), encoding="utf-8")
+            publications_file.write_text(yaml.safe_dump(publications_data, sort_keys=False), encoding="utf-8")
+
+            with mock.patch.object(sync_publications_hal, "fetch_hal_publications", return_value=hal_fixture):
+                exit_code = sync_publications_hal.main(
+                    [
+                        "--base-file",
+                        str(base_file),
+                        "--publications-file",
+                        str(publications_file),
+                        "--output-file",
+                        str(publications_file),
+                        "--apply",
+                        "--source-mode",
+                        "hal_only",
+                    ]
+                )
+
+            self.assertEqual(exit_code, 0)
+            updated = yaml.safe_load(publications_file.read_text(encoding="utf-8"))
+            self.assertEqual(updated["publications"]["journal_articles"][0]["title"], "Split mode paper")
+            self.assertEqual(updated["conference_presentations"][0]["sync"], "manual")
+            self.assertIn("index", updated["conference_presentations"][0])
+
+
 class HyphenatedAuthorParsingTests(unittest.TestCase):
     """Tests for A: Fix author parsing for hyphenated initials."""
 
