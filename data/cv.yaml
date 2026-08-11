@@ -42,7 +42,7 @@ personal:
   firstname: Scott
   familyname: "Love, PhD"
   title: "May 1981, UK Citizen"
-  email: love.a.scott@gmail.com
+  email: scott.love@inrae.fr
   orcid: "0000-0001-7416-9210"  # manual
   id_hal: ""  # manual
   photo: pictures/scott
@@ -143,7 +143,7 @@ experience:
       institution: University of Tours
       country: ""
       year: "2022 - present"
-      notes: Groups of ~15 students each year
+      notes: Groups of ~20 students each year
 
     - course: P335 Cognitive Psychology
       institution: Indiana University
@@ -765,13 +765,369 @@ publications:
       url: ""
 
   under_review_or_in_prep:
+    - sync: manual   # manual
+      authors: []
+      year: ""
+      title: "Love, S"
+      journal: ""
+      status: under review
+      impact_factor: ""
+      quartile: ""
+      doi: ""
+      url: ""
+
+    - sync: manual   # manual
+      authors: []
+      year: ""
+      title: "Love, S"
+      journal: ""
+      status: under review
+      impact_factor: ""
+      quartile: ""
+      doi: ""
+      url: ""
+
 
 
 # ------------------------------------------------------------------------------
 # CONFERENCE PRESENTATIONS
 # ------------------------------------------------------------------------------
 
-conference_presentations: []
+conference_presentations:
+  - index: 1
+    authors:
+      - "Love, S.A."
+      - "Auge, M."
+      - "Siwiaszczyk, M."
+      - "Destrieux, C."
+      - "Andersson, F."
+      - "Chaillou, E"
+    year: 2016
+    title: "Surface-based cortical parcellation of the sheep brain"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 2
+    authors:
+      - "Love, S.A."
+      - "Marie, D."
+      - "Roth, M."
+      - "Lacoste, R."
+      - "Nazarian, B."
+      - "Bertello, A."
+      - "Coulon, O."
+      - "Anton, J.-L."
+      - "Meguerditchian, A"
+    year: 2016
+    title: "The average baboon brain: MRI templates and tissue probability maps from 89 individuals"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 3
+    authors:
+      - "Marie, D."
+      - "Margiotoudi, K."
+      - "Coulon, O."
+      - "Roth, M."
+      - "Lacoste, R."
+      - "Nazarian, B."
+      - "Bertello, A."
+      - "Anton, JL."
+      - "Hopkins, W.D."
+      - "Love, S.A."
+      - "Meguerditchian, A"
+    year: 2016
+    title: "Brain asymmetries of two language-related area homologs in baboon structural MRI"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 4
+    authors:
+      - "Marie, D."
+      - "Margiotoudi, K."
+      - "Coulon, O."
+      - "Roth, M."
+      - "Lacoste, R."
+      - "Nazarian, B."
+      - "Bertello, A."
+      - "Anton, JL."
+      - "Hopkins, W.D."
+      - "Love, S.A."
+      - "Meguerditchian, A"
+    year: 2016
+    title: "Brain asymmetries of two language-related area homologs in baboon structural MRI"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 5
+    authors:
+      - "Chaillou, E."
+      - "Barantin, L."
+      - "Andersson, F."
+      - "Filipiak, I."
+      - "Delaplace, R."
+      - "Morisse, M."
+      - "Sta, M."
+      - "Haslin, E."
+      - "Love, S.A."
+      - "Levy, F."
+      - "Nowak, R"
+    year: 2016
+    title: Impact of early rearing experience on brain development in sheep infant
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 6
+    authors:
+      - "Puce, A."
+      - "Latinus, M."
+      - "Love, S.A."
+      - "Rossi, A."
+      - "Parada, F."
+      - "Huang, L."
+      - "Conty, L."
+      - "James, K."
+      - "George, N"
+    year: 2014
+    title: Neural activity to viewed dynamic gaze is affected by social decision
+    venue: ""
+    location: ""
+    date: ""
+    type: oral
+
+  - index: 7
+    authors:
+      - "Love, S.A."
+      - "Fukushima, M."
+      - "Doyle, R.C."
+      - "Saunders, R.C."
+      - "Fujii, N."
+      - "Belin, P."
+      - "Mishkin, M."
+      - "Leopold, D.A"
+    year: 2014
+    title: "Norm-based neural coding of conspecific vocalizations in the macaque monkey"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 8
+    authors:
+      - "Love, S.A."
+      - "Latinus, M."
+      - "Belin, P"
+    year: 2014
+    title: Investigating categorization selectivity in the auditory cortex with high spatial resolution fMRI
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 9
+    authors:
+      - "Regener, P."
+      - "Love, S.A."
+      - "Petrini, K."
+      - "Pollick, F"
+    year: 2014
+    title: "Audiovisual processing differences in autism spectrum disorder revealed by a model-based analysis of simultaneity and temporal order judgments"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 10
+    authors:
+      - "Petrini, K."
+      - "Denis, G."
+      - "Love, S.A"
+      - "Nardini, M"
+    year: 2013
+    title: "The face and voice of multisensory integration: prior knowledge affects multisensory integration from early childhood"
+    venue: ""
+    location: ""
+    date: ""
+    type: oral
+
+  - index: 11
+    authors:
+      - "Regener, P."
+      - "Love, S.A."
+      - "Petrini, K."
+      - "Simmons, D."
+      - "Pollick, F"
+    year: 2013
+    title: Audiovisual temporal integration in Autism Spectrum Disorder
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 12
+    authors:
+      - "Latinus, M."
+      - "Joassin, F."
+      - "Watson, R."
+      - "Charest, I."
+      - "Love, S.A"
+      - "McAleer, P."
+      - "Belin, P"
+    year: 2011
+    title: Conjoint and independent neural coding of bimodal face/voice identity investigated with fMRI
+    venue: ""
+    location: ""
+    date: ""
+    type: oral
+
+  - index: 13
+    authors:
+      - "McAleer, P."
+      - "Becirspahic, M."
+      - "Pollick, F. E."
+      - "Paterson, H. M."
+      - "Latinus, M."
+      - "Belin, P."
+      - "Love, S.A"
+    year: 2011
+    title: "Giving life to circles and rectangles: Animacy, intention and fMRI"
+    venue: ""
+    location: ""
+    date: ""
+    type: oral
+
+  - index: 14
+    authors:
+      - "Latinus, M."
+      - "Joassin, F."
+      - "Watson, R."
+      - "Charest, I."
+      - "Love, S.A."
+      - "Belin, P"
+    year: 2011
+    title: Conjoint and independent neural coding of bimodal face/voice identity investigated with fMRI
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 15
+    authors:
+      - "Love, S."
+      - "Petrini, K."
+      - "Cheng, A."
+      - "Pollick, F.E"
+    year: 2011
+    title: Differences between synchrony and temporal order judgments for simple and Complex Stimuli
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 16
+    authors:
+      - "McAleer, P."
+      - "Becirspahic, M."
+      - "Love, S.A"
+    year: 2011
+    title: "How does your brain see “living” circles: A study of animacy and intention using fMRI"
+    venue: ""
+    location: ""
+    date: ""
+    type: oral
+
+  - index: 17
+    authors:
+      - "Love, S."
+      - "Latinus, M."
+      - "McAleer, P."
+      - "Pollick, F.E"
+    year: 2010
+    title: "Investigating synchrony perception of audiovisual speech with a continuous carry-over fMRI design"
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 18
+    authors:
+      - "McAleer, P."
+      - "Pollick, F.E."
+      - "Crabbe, F."
+      - "Love, S."
+      - "Zacks, J.M"
+    year: 2010
+    title: hMT+ and pSTS correlate with motion properties viewed in long video displays of human activities
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 19
+    authors:
+      - "Love, S."
+      - "Latinus, M."
+      - "McAleer, P."
+      - "Pollick, F.E. ("
+    year: 2010
+    title: )
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 20
+    authors:
+      - "Love, S."
+      - "Hillis, J.M."
+      - "Pollick, F.E"
+    year: 2008
+    title: ""
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 21
+    authors:
+      - "Love, S."
+      - "Hillis, J.M."
+      - "Waadeland, C.H."
+      - "Rocchesso, D."
+      - "Avanzini, F."
+      - "Dahl, S."
+      - "Pollick, F.E"
+    year: 2007
+    title: How audio and visual cues combine to discriminate the tempo of swing groove drumming
+    venue: ""
+    location: ""
+    date: ""
+    type: poster
+
+  - index: 22
+    authors:
+      - "Pollick, F.E."
+      - "Love, S."
+      - "Hillis, J.M."
+      - "Russell, M."
+      - "Petrini, K"
+    year: 2007
+    title: "Is musical experience equal to the sum of sight and sound? An investigation of swing groove drumming"
+    venue: ""
+    location: ""
+    date: ""
+    type: oral
+
 
 
 # ------------------------------------------------------------------------------
@@ -785,7 +1141,15 @@ skills: {}
 # LANGUAGES
 # ------------------------------------------------------------------------------
 
-languages: []
+languages:
+  - language: English
+    proficiency: Mothertongue
+    scale: ""
+
+  - language: French
+    proficiency: Fluent
+    scale: ""
+
 
 
 # ------------------------------------------------------------------------------
