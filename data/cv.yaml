@@ -21,6 +21,22 @@ cv:
     style: "casual"
     color: "blue"
   generated_from: "overleaf_seed"
+  # Section rendering order.  Remove, reorder, or add keys to customise the
+  # layout.  Supported keys:
+  #   education, professional_experience, funding, honors_awards, skills,
+  #   languages, publications, conference_presentations
+  section_order:
+    - education
+    - professional_experience
+    - funding
+    - honors_awards
+    - skills
+    - languages
+    - publications
+    - conference_presentations
+  # Set to true to number publications with the highest number first
+  # (reverse chronological display order).
+  pub_reverse_numbering: false
 
 # Publication sync configuration
 publication_sync:
@@ -161,6 +177,33 @@ experience:
 
 
 # ------------------------------------------------------------------------------
+# FUNDING
+# ------------------------------------------------------------------------------
+
+funding:
+  - years: "2024 - 2026"
+    description: >-
+      American NIH - Towards High-Resolution Neuro-Behavioral Quantification of Sheep in the Field to Study Complex Social Behaviors. 685k. Coordination : C. Kemere, Partenaires : INRAE (PRC – Coordination : S. Love), Rice University, Georgia Tech, Centre de Recherches sur la Cognition Animale, Baylor College of Medicine.
+
+  - years: "2024 - 2026"
+    description: >-
+      ANR SAPS-RA-AI - (CoCerACoCo) Connaitre le cerveau des animaux pour mieux comprendre leurs comportements. 150k€. Coordination: E. Chaillou, Partenaires : Université d’Angers (LARIS), Université d’Orléans (ERCAE), Université de Tours (LIFAT), Université Savoie-Mont-Blanc (LISTIC), INSERM (iBrain), CEA (NeuroSpin), Zooparc de Beauval, Beauval Nature.
+
+  - years: "2021 - 2024"
+    description: >-
+      ANR JCJC – (SheepVoicefMRI) Neuroimagerie fonctionnelle des mécanismes de la perception des voix chez le mouton. 200k€. Coordination : S. Love. Partenaires : UMR PRC.
+
+  - years: "2020 - 2021"
+    description: >-
+      Crédits Incitatifs PHASE-INRAE. Functional MRI of the sheep auditory cortex. 20k€. Coordination : S. Love. Partenaires : UMR PRC.
+
+  - years: "2018 - 2022"
+    description: >-
+      Projet d’intérêt regional – (Neuro2Co) Neurobiologie des comportements des animaux, démarche de sciences participatives au collège. 210k€ of which 200k€ dedicated to research. Coordination : E. Chaillou. Partenaires « recherche » : UMR PRC, iBrain (Inserm), LIFAT (Univ. Tours), NeuroSpin (CEA), ZooParc de Beauval et Beauval Nature.
+
+
+
+# ------------------------------------------------------------------------------
 # PUBLICATIONS
 # ------------------------------------------------------------------------------
 
@@ -182,7 +225,7 @@ publications:
         - "Bertin, A."
         - "Arnould, C"
       year: 2025
-      title: Adult chicken hens express their affective states via bare facial skin blushing and head feather movements
+      title: Adult chicken hens express their affective states via bare facial skin blushing and head feather movements.
       journal: Animal Behaviour
       volume: ""
       pages: ""
@@ -300,7 +343,7 @@ publications:
         - "Bertin, A."
         - "Arnould, C"
       year: 2024
-      title: Exploration of skin redness and immunoglobulin A as markers of the affective states of hens
+      title: Exploration of skin redness and immunoglobulin A as markers of the affective states of hens.
       journal: Applied Animal Behaviour Science
       volume: ""
       pages: ""
@@ -317,7 +360,7 @@ publications:
         - "Petrini, K."
         - "Pollick, F"
       year: 2024
-      title: Differences in audiovisual temporal processing in autistic adults are specific to simultaneity judgments
+      title: Differences in audiovisual temporal processing in autistic adults are specific to simultaneity judgments.
       journal: Autism Research
       volume: ""
       pages: ""
@@ -337,7 +380,7 @@ publications:
         - "Arnould, C."
         - "Lansade, L"
       year: 2023
-      title: "Captive Blue-and-yellow macaws (Ara ararauna) show facial indicators of positive affect when reunited with their caregiver"
+      title: "Captive Blue-and-yellow macaws (Ara ararauna) show facial indicators of positive affect when reunited with their caregiver."
       journal: Behavioural Processes
       volume: ""
       pages: ""
@@ -357,7 +400,7 @@ publications:
         - "Love, S. A."
         - "Chaillou, E"
       year: 2022
-      title: The use and impact of auditory stimulation in animals
+      title: The use and impact of auditory stimulation in animals.
       journal: Journal of Interdisciplinary Methodologies and Issues in Sciences
       volume: ""
       pages: ""
@@ -372,7 +415,7 @@ publications:
         - "Love, S. A."
         - "Chaillou, E"
       year: 2022
-      title: "BAA, BAA: Can Sheep Talk to Each Other?"
+      title: "BAA, BAA: Can Sheep Talk to Each Other?."
       journal: Frontiers for Young Minds
       volume: ""
       pages: ""
@@ -397,7 +440,7 @@ publications:
         - "Uszynski, I."
         - "Poupon, C"
       year: 2022
-      title: "A novel male Japanese quail structural connectivity atlas using ultra-high field diffusion MRI at 11"
+      title: "A novel male Japanese quail structural connectivity atlas using ultra-high field diffusion MRI at 11."
       journal: Brain Structure and Function 227(5)
       volume: ""
       pages: ""
@@ -424,7 +467,7 @@ publications:
         - "Nowak, R."
         - "Chaillou, E"
       year: 2022
-      title: Maternal deprivation and milk replacement affect the integrity of gray and white matter in the developing lamb brain
+      title: Maternal deprivation and milk replacement affect the integrity of gray and white matter in the developing lamb brain.
       journal: Developmental Neurobiology 82
       volume: ""
       pages: ""
@@ -447,7 +490,7 @@ publications:
         - "Kang, Y."
         - "Tu, T. W"
       year: 2022
-      title: A Baboon Brain Atlas for Magnetic Resonance Imaging and Positron Emission Tomography Image Analysis
+      title: A Baboon Brain Atlas for Magnetic Resonance Imaging and Positron Emission Tomography Image Analysis.
       journal: "Frontiers in Neuroanatomy 15:778769"
       volume: ""
       pages: ""
@@ -463,7 +506,7 @@ publications:
         - "Love, S. A."
         - "Nardini, M"
       year: 2020
-      title: "Combining the senses: the role of experience- and task-dependent mechanisms in the development of audiovisual simultaneity perception"
+      title: "Combining the senses: the role of experience- and task-dependent mechanisms in the development of audiovisual simultaneity perception."
       journal: "Journal of Experimental Psychology: Human Perception and Performance 46(10)"
       volume: ""
       pages: ""
@@ -517,7 +560,7 @@ publications:
         - "Love, S.A."
         - "Latinus, M"
       year: 2017
-      title: "Familiarity and voice representation: from acoustic-based representation to voice averages"
+      title: "Familiarity and voice representation: from acoustic-based representation to voice averages."
       journal: Frontiers in Psychology
       volume: ""
       pages: ""
@@ -539,7 +582,7 @@ publications:
         - "Love, S.A."
         - "Meguerditchian, A"
       year: 2017
-      title: "Left brain asymmetry of the planum temporale in a nonhominid primate: redefining the origin of brain specialization for language"
+      title: "Left brain asymmetry of the planum temporale in a nonhominid primate: redefining the origin of brain specialization for language."
       journal: Cerebral Cortex
       volume: ""
       pages: ""
@@ -560,7 +603,7 @@ publications:
         - "Anton, J.-L."
         - "Meguerditchian, A"
       year: 2016
-      title: "The average baboon brain: MRI templates and tissue probability maps from 89 individuals"
+      title: "The average baboon brain: MRI templates and tissue probability maps from 89 individuals."
       journal: "Neuroimage 132,"
       volume: ""
       pages: ""
@@ -581,7 +624,7 @@ publications:
         - "Janot, K."
         - "Zemmoura, I"
       year: 2016
-      title: A practical guide for the identification of major sulcogyral structures of the human cortex
+      title: A practical guide for the identification of major sulcogyral structures of the human cortex.
       journal: Brain Structure and Function
       volume: ""
       pages: ""
@@ -602,7 +645,7 @@ publications:
         - "James, K."
         - "Puce, A"
       year: 2015
-      title: Social decisions affect neural activity to perceived dynamic gaze
+      title: Social decisions affect neural activity to perceived dynamic gaze.
       journal: "Social Cognitive and Affective Neuroscience 10(11),"
       volume: ""
       pages: ""
@@ -619,7 +662,7 @@ publications:
         - "Crabbe, F."
         - "Zacks, J.M"
       year: 2013
-      title: The role of kinematics in cortical regions for continuous human motion perception
+      title: The role of kinematics in cortical regions for continuous human motion perception.
       journal: "Cognitive, affective & behavioral neuroscience 14(1),"
       volume: ""
       pages: ""
@@ -635,7 +678,7 @@ publications:
         - "Cheng, A"
         - "Pollick, F.E"
       year: 2013
-      title: A Psychophysical Investigation of Differences Between Synchrony and Temporal Order Judgments
+      title: A Psychophysical Investigation of Differences Between Synchrony and Temporal Order Judgments.
       journal: PLoS ONE 8
       volume: ""
       pages: ""
@@ -653,7 +696,7 @@ publications:
         - "Morison, G."
         - "Pollick, F.E"
       year: 2013
-      title: "Uni- and multisensory brain areas are synchronised across spectators when watching unedited dance recordings"
+      title: "Uni- and multisensory brain areas are synchronised across spectators when watching unedited dance recordings."
       journal: "i-Perception 4"
       volume: ""
       pages: ""
@@ -668,7 +711,7 @@ publications:
         - "Pollick, F.E."
         - "Latinus, M"
       year: 2011
-      title: "Cerebral Correlates and Statistical Criteria of Cross-Modal Face and Voice Integration"
+      title: "Cerebral Correlates and Statistical Criteria of Cross-Modal Face and Voice Integration."
       journal: "Seeing and Perceiving 24,"
       volume: ""
       pages: ""
@@ -691,7 +734,7 @@ publications:
         - "Avanzini, F."
         - "Puce, A"
       year: 2011
-      title: "Action expertise reduces brain activity for audiovisual matching actions: an fMRI study with expert drummers"
+      title: "Action expertise reduces brain activity for audiovisual matching actions: an fMRI study with expert drummers."
       journal: "Neuroimage 56,"
       volume: ""
       pages: ""
@@ -712,7 +755,7 @@ publications:
         - "Ashourvan, A."
         - "Jayaramen, S"
       year: 2015
-      title: "Neural Basis for Social Attention in Healthy Humans, in: Puce, A"
+      title: "Neural Basis for Social Attention in Healthy Humans, in: Puce, A."
       book: "The Many Faces of Social Attention: Behavioral and Neural Measures."
       editors: []
       publisher: ""
@@ -726,7 +769,7 @@ publications:
         - "Maurage, P."
         - "Love, S.A., D’Hondt, F"
       year: 2013
-      title: "Crossmodal Integration of Emotional Stimuli in Alcohol Dependence, in: Belin, P"
+      title: "Crossmodal Integration of Emotional Stimuli in Alcohol Dependence, in: Belin, P."
       book: Integrating Face and Voice in Person Perception.
       editors: []
       publisher: ""
@@ -740,7 +783,7 @@ publications:
         - "McAleer, P."
         - "Love, S. A"
       year: 2013
-      title: Perceiving intention in animacy displays created from human motion
+      title: Perceiving intention in animacy displays created from human motion.
       book: "Social Perception: Detection and Interpretation of Animacy, Agency, and Intention."
       editors: []
       publisher: ""
@@ -755,7 +798,7 @@ publications:
         - "Pollick, F.E."
         - "Petrini, K"
       year: 2012
-      title: "Effects of Experience, Training and Expertise on Multisensory Perception: Investigating the Link between Brain and Behavior, in: Esposito, A"
+      title: "Effects of Experience, Training and Expertise on Multisensory Perception: Investigating the Link between Brain and Behavior, in: Esposito, A."
       book: "Cognitive Behavioural Systems, Lecture Notes in Computer Science."
       editors: []
       publisher: ""
@@ -768,7 +811,7 @@ publications:
     - sync: manual   # manual
       authors: []
       year: ""
-      title: "Love, S"
+      title: "Love, S."
       journal: ""
       status: under review
       impact_factor: ""
@@ -779,7 +822,7 @@ publications:
     - sync: manual   # manual
       authors: []
       year: ""
-      title: "Love, S"
+      title: "Love, S."
       journal: ""
       status: under review
       impact_factor: ""
@@ -804,9 +847,9 @@ conference_presentations:
       - "Chaillou, E"
     year: 2016
     title: "Surface-based cortical parcellation of the sheep brain"
-    venue: ""
-    location: ""
-    date: ""
+    venue: 2e Journée Thématique de Société des Neurosciences
+    location: Tour
+    date: "May 24-25"
     type: poster
 
   - index: 2
@@ -822,9 +865,9 @@ conference_presentations:
       - "Meguerditchian, A"
     year: 2016
     title: "The average baboon brain: MRI templates and tissue probability maps from 89 individuals"
-    venue: ""
-    location: ""
-    date: ""
+    venue: Human Brain Mapping Conference
+    location: Geneva
+    date: "June 26-30"
     type: poster
 
   - index: 3
@@ -842,9 +885,9 @@ conference_presentations:
       - "Meguerditchian, A"
     year: 2016
     title: "Brain asymmetries of two language-related area homologs in baboon structural MRI"
-    venue: ""
-    location: ""
-    date: ""
+    venue: Human Brain Mapping Conference
+    location: Geneva
+    date: "June 26-30"
     type: poster
 
   - index: 4
@@ -862,9 +905,9 @@ conference_presentations:
       - "Meguerditchian, A"
     year: 2016
     title: "Brain asymmetries of two language-related area homologs in baboon structural MRI"
-    venue: ""
-    location: ""
-    date: ""
+    venue: Human Brain Mapping Conference
+    location: Geneva
+    date: "June 26-30"
     type: poster
 
   - index: 5
@@ -882,9 +925,9 @@ conference_presentations:
       - "Nowak, R"
     year: 2016
     title: Impact of early rearing experience on brain development in sheep infant
-    venue: ""
-    location: ""
-    date: ""
+    venue: Forum of Neuroscience
+    location: Copenhagen
+    date: "July 2-6"
     type: poster
 
   - index: 6
@@ -900,9 +943,9 @@ conference_presentations:
       - "George, N"
     year: 2014
     title: Neural activity to viewed dynamic gaze is affected by social decision
-    venue: ""
-    location: ""
-    date: ""
+    venue: "XII International Conference on Cognitive Neuroscience (ICON-XII), Brisbane, Queensland"
+    location: Australia
+    date: "July 27 - 31"
     type: oral
 
   - index: 7
@@ -917,9 +960,9 @@ conference_presentations:
       - "Leopold, D.A"
     year: 2014
     title: "Norm-based neural coding of conspecific vocalizations in the macaque monkey"
-    venue: ""
-    location: ""
-    date: ""
+    venue: Society for Neuroscience
+    location: Washington DC
+    date: November 15 – 19
     type: poster
 
   - index: 8
@@ -929,8 +972,8 @@ conference_presentations:
       - "Belin, P"
     year: 2014
     title: Investigating categorization selectivity in the auditory cortex with high spatial resolution fMRI
-    venue: ""
-    location: ""
+    venue: International Conference on Auditory Cortex
+    location: Magdeburg September 13 – 17
     date: ""
     type: poster
 
@@ -942,9 +985,9 @@ conference_presentations:
       - "Pollick, F"
     year: 2014
     title: "Audiovisual processing differences in autism spectrum disorder revealed by a model-based analysis of simultaneity and temporal order judgments"
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Vision Sciences Society Conference, Florida"
+    location: USA
+    date: "May 16-21"
     type: poster
 
   - index: 10
@@ -955,9 +998,9 @@ conference_presentations:
       - "Nardini, M"
     year: 2013
     title: "The face and voice of multisensory integration: prior knowledge affects multisensory integration from early childhood"
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Vision Sciences Society Conference, Florida"
+    location: USA
+    date: "May 10-15"
     type: oral
 
   - index: 11
@@ -969,9 +1012,9 @@ conference_presentations:
       - "Pollick, F"
     year: 2013
     title: Audiovisual temporal integration in Autism Spectrum Disorder
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Vision Sciences Society Conference, Florida"
+    location: USA
+    date: "May 10-15"
     type: poster
 
   - index: 12
@@ -985,9 +1028,9 @@ conference_presentations:
       - "Belin, P"
     year: 2011
     title: Conjoint and independent neural coding of bimodal face/voice identity investigated with fMRI
-    venue: ""
-    location: ""
-    date: ""
+    venue: "European Conference on Visual Perception, Toulouse"
+    location: France
+    date: Aug 28 – Sept 1
     type: oral
 
   - index: 13
@@ -1001,9 +1044,9 @@ conference_presentations:
       - "Love, S.A"
     year: 2011
     title: "Giving life to circles and rectangles: Animacy, intention and fMRI"
-    venue: ""
-    location: ""
-    date: ""
+    venue: "European Conference on Visual Perception, Toulouse"
+    location: France
+    date: Aug 28 – Sept 1
     type: oral
 
   - index: 14
@@ -1016,9 +1059,9 @@ conference_presentations:
       - "Belin, P"
     year: 2011
     title: Conjoint and independent neural coding of bimodal face/voice identity investigated with fMRI
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Human Brain Mapping Conference, Quebec"
+    location: Canada
+    date: "June 26-30"
     type: poster
 
   - index: 15
@@ -1029,9 +1072,9 @@ conference_presentations:
       - "Pollick, F.E"
     year: 2011
     title: Differences between synchrony and temporal order judgments for simple and Complex Stimuli
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Vision Sciences Society Conference, Florida"
+    location: USA
+    date: "May 6-11"
     type: poster
 
   - index: 16
@@ -1041,9 +1084,9 @@ conference_presentations:
       - "Love, S.A"
     year: 2011
     title: "How does your brain see “living” circles: A study of animacy and intention using fMRI"
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Scottish Vision Group Conference, Skye"
+    location: Scotland
+    date: "March 25-27"
     type: oral
 
   - index: 17
@@ -1054,9 +1097,9 @@ conference_presentations:
       - "Pollick, F.E"
     year: 2010
     title: "Investigating synchrony perception of audiovisual speech with a continuous carry-over fMRI design"
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Human Brain Mapping Conference, Barcelona"
+    location: Spain
+    date: "June 6-10"
     type: poster
 
   - index: 18
@@ -1068,9 +1111,9 @@ conference_presentations:
       - "Zacks, J.M"
     year: 2010
     title: hMT+ and pSTS correlate with motion properties viewed in long video displays of human activities
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Human Brain Mapping Conference, Barcelona"
+    location: Spain
+    date: "June 6-10"
     type: poster
 
   - index: 19
@@ -1081,9 +1124,9 @@ conference_presentations:
       - "Pollick, F.E. ("
     year: 2010
     title: )
-    venue: ""
-    location: ""
-    date: ""
+    venue: "International Multisensory Research Forum Conference, Liverpool"
+    location: UK
+    date: "June 16-19"
     type: poster
 
   - index: 20
@@ -1093,9 +1136,9 @@ conference_presentations:
       - "Pollick, F.E"
     year: 2008
     title: ""
-    venue: ""
-    location: ""
-    date: ""
+    venue: "International Multisensory Research Forum Conference, Hamburg"
+    location: Germany
+    date: "July 16-19"
     type: poster
 
   - index: 21
@@ -1109,9 +1152,9 @@ conference_presentations:
       - "Pollick, F.E"
     year: 2007
     title: How audio and visual cues combine to discriminate the tempo of swing groove drumming
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Vision Sciences Society Conference, Florida"
+    location: USA
+    date: "May 11-16"
     type: poster
 
   - index: 22
@@ -1123,9 +1166,9 @@ conference_presentations:
       - "Petrini, K"
     year: 2007
     title: "Is musical experience equal to the sum of sight and sound? An investigation of swing groove drumming"
-    venue: ""
-    location: ""
-    date: ""
+    venue: "Society for Music Perception and Cognition Conference, Montreal"
+    location: Canada
+    date: "July 30 - Aug 3"
     type: oral
 
 
