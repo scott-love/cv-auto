@@ -2,7 +2,7 @@
 """
 extract_from_latex.py
 =====================
-Parses the existing LaTeX CV (source-material/cv_7.tex) and writes a
+Parses the existing LaTeX CV (source-material/cv_full_seed.tex) and writes a
 populated data/cv.yaml file.
 
 Usage
@@ -11,7 +11,7 @@ Usage
 
 Defaults
 --------
-    --input   source-material/cv_7.tex
+    --input   source-material/cv_full_seed.tex
     --output  data/cv.yaml
 
 The script can be safely re-run after editing the LaTeX source; it always
@@ -40,7 +40,7 @@ from textwrap import indent
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
-DEFAULT_INPUT = os.path.join(REPO_ROOT, "source-material", "cv_7.tex")
+DEFAULT_INPUT = os.path.join(REPO_ROOT, "source-material", "cv_full_seed.tex")
 DEFAULT_OUTPUT = os.path.join(REPO_ROOT, "data", "cv.yaml")
 
 

@@ -24,8 +24,7 @@ cv:
 
 # Publication sync configuration
 publication_sync:
-  # Local YAML data remains canonical ground truth; remote sync only proposes
-  # upstream publication metadata that can be merged back into this file.
+  # Local YAML data stays canonical; sync sources are upstream providers only.
   source_mode: hal_plus_orcid  # hal_only | orcid_only | hal_plus_orcid
   sources:
     hal: true
@@ -45,7 +44,7 @@ personal:
   title: "May 1981, UK Citizen"
   email: love.a.scott@gmail.com
   orcid: "0000-0001-7416-9210"  # manual
-  id_hal: "scott-love"  # manual
+  id_hal: ""  # manual
   photo: pictures/scott
   homepage: "scott-love.github.io"
   mobile: ""
@@ -174,8 +173,7 @@ publications:
       authors:
         - "Soulet, D."
         - "Love, S. A."
-        - Blache
-        - "M-C."
+        - "Blache, M-C."
         - "Parias, C."
         - "Piégu, B."
         - "Lefort, G."
@@ -196,8 +194,7 @@ publications:
     - sync: auto   # auto-sync
       authors:
         - "Pluchot, C."
-        - "Morisse, M.,Graïc"
-        - "J-M."
+        - "Morisse, M.,Graïc, J-M."
         - "Chaillou, E."
         - "Love, S. A"
       year: 2025
@@ -251,8 +248,7 @@ publications:
         - "Love, S. A."
         - "Piégu, B."
         - "Lefort, G."
-        - Blache
-        - "M-C."
+        - "Blache, M-C."
         - "Soulet, D."
         - "Lévy, F."
         - "Nowak, R."
@@ -293,8 +289,7 @@ publications:
         - "Jahoul, A."
         - "Guabiraba, R."
         - "Lansade, L."
-        - Blache
-        - "M-C."
+        - "Blache, M-C."
         - "Piégu, B."
         - "Lefort, G."
         - "Guillory, V."
@@ -336,8 +331,7 @@ publications:
         - "Bertin, A."
         - "Mulot, B."
         - "Nowak, R."
-        - Blache
-        - "M-C. Love, S. A."
+        - "Blache, M-C. Love, S. A."
         - "Mathilde, A."
         - "Pinateau, A."
         - "Arnould, C."
@@ -816,4 +810,5 @@ honors_awards:
 
   - year: 2008
     award: "Attendance funding award, Workshop “Cue Combination - Unifying perceptual theory”"
+
 
