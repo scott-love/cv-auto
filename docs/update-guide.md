@@ -64,7 +64,11 @@ list and reports a warning in the sync output.
 
 ## Publication sync workflow
 
-Preview first:
+Sync reads `data/cv.yaml` (the canonical source) and writes merged output to a
+**separate file** (`data/cv.synced.yaml`) by default. The canonical file is never
+overwritten automatically, so your hand-written comments and edits are preserved.
+
+Preview first (no files changed):
 
 ```bash
 python scripts/sync_publications_hal.py --dry-run
@@ -78,13 +82,60 @@ python scripts/sync_publications_hal.py --dry-run --source-mode orcid_only
 python scripts/sync_publications_hal.py --dry-run --source-mode hal_plus_orcid
 ```
 
-Apply changes after review:
+Apply changes to the default synced output file (`data/cv.synced.yaml`):
 
 ```bash
 python scripts/sync_publications_hal.py \
   --apply \
   --report-file build/publication-sync-report.md
 ```
+
+The file `data/cv.synced.yaml` is generated and carries a header comment
+indicating it is auto-generated — do not edit it manually.
+
+To explicitly overwrite the canonical file (use with care):
+
+```bash
+python scripts/sync_publications_hal.py \
+  --apply \
+  --output-file data/cv.yaml \
+  --report-file build/publication-sync-report.md
+```
+
+To write to a custom path:
+
+```bash
+python scripts/sync_publications_hal.py \
+  --apply \
+  --output-file data/my-review.yaml
+```
+
+### CLI options
+
+| Option | Default | Description |
+|---|---|---|
+| `--cv-file` | `data/cv.yaml` | Canonical input file |
+| `--output-file` | `data/cv.synced.yaml` | Where merged output is written |
+| `--source-mode` | from config | `hal_only` / `orcid_only` / `hal_plus_orcid` |
+| `--hal-id` | from `personal.id_hal` | HAL author identifier |
+| `--orcid` | from `personal.orcid` | ORCID identifier |
+| `--report-file` | none | Markdown report path (apply mode only) |
+| `--dry-run` | — | Preview without writing files |
+| `--apply` | — | Write output to `--output-file` |
+
+### Preprint dedup policy
+
+After merging, the sync script detects records in `journal_articles` whose
+`publication_type` indicates a preprint/non-final version (e.g. `other`,
+`report`, `preprint`) and whose title exactly matches an existing
+`journal-article` record. These duplicate preprint records are automatically:
+
+- reclassified to `publication_type: preprint`
+- moved to `under_review_or_in_prep`
+- tagged with a `status` field noting which published DOI supersedes them
+
+This prevents a Zenodo preprint from appearing as a duplicate journal article.
+The sync report includes a **Deduped preprints** section listing all such actions.
 
 ## Good next automation steps
 - structured CV schema

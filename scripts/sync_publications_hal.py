@@ -30,6 +30,7 @@ except ImportError:
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CV_FILE = REPO_ROOT / "data" / "cv.yaml"
+DEFAULT_SYNCED_FILE = REPO_ROOT / "data" / "cv.synced.yaml"
 
 SECTION_FIELDS = {
     "journal_articles": [
@@ -118,6 +119,7 @@ ORCID_TYPE_MAP = {
 @dataclass
 class SyncConfig:
     cv_file: Path
+    output_file: Path
     source_mode: str
     hal_id: str
     orcid: str
@@ -127,7 +129,12 @@ class SyncConfig:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cv-file", default=str(DEFAULT_CV_FILE), help="Path to data/cv.yaml")
+    parser.add_argument("--cv-file", default=str(DEFAULT_CV_FILE), help="Path to data/cv.yaml (canonical input)")
+    parser.add_argument(
+        "--output-file",
+        default=str(DEFAULT_SYNCED_FILE),
+        help="Path for synced output (default: data/cv.synced.yaml). Use --cv-file value to overwrite canonical.",
+    )
     parser.add_argument(
         "--source-mode",
         choices=["hal_only", "orcid_only", "hal_plus_orcid"],
@@ -141,7 +148,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     mode_group = parser.add_mutually_exclusive_group()
     mode_group.add_argument("--dry-run", action="store_true", help="Preview without changing files")
-    mode_group.add_argument("--apply", action="store_true", help="Write changes to the CV YAML file")
+    mode_group.add_argument("--apply", action="store_true", help="Write merged output to --output-file")
     return parser.parse_args(argv)
 
 
@@ -158,9 +165,11 @@ def load_yaml(path: Path) -> dict[str, Any]:
     return data
 
 
-def save_yaml(path: Path, data: dict[str, Any]) -> None:
+def save_yaml(path: Path, data: dict[str, Any], header: str | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
+        if header:
+            handle.write(header)
         yaml.safe_dump(
             data,
             handle,
@@ -255,6 +264,7 @@ def build_sync_config(args: argparse.Namespace, cv_data: dict[str, Any]) -> Sync
 
     return SyncConfig(
         cv_file=Path(args.cv_file),
+        output_file=Path(args.output_file),
         source_mode=source_mode,
         hal_id=hal_id,
         orcid=orcid,
@@ -619,6 +629,68 @@ def prune_record_for_section(record: dict[str, Any]) -> dict[str, Any]:
     return pruned
 
 
+PREPRINT_SOURCE_TYPES = {"preprint", "other", "report", "working-paper"}
+
+
+def classify_and_dedup_preprints(
+    publications: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Detect duplicate preprint/published pairs and reclassify preprints.
+
+    Policy:
+    - If a record in journal_articles has publication_type in PREPRINT_SOURCE_TYPES
+      and another record in journal_articles (or under_review_or_in_prep) has the
+      same normalized title with publication_type 'journal-article', the first is
+      a preprint duplicate.
+    - The preprint record is reclassified as 'preprint', moved to
+      under_review_or_in_prep, and tagged with 'superseded_by' the DOI/title of
+      the published version.
+    - Returns a list of dedup actions for the sync report.
+    """
+    dedup_actions: list[dict[str, Any]] = []
+    journal_articles = publications.get("journal_articles") or []
+    under_review = publications.get("under_review_or_in_prep") or []
+
+    # Build a lookup of published journal articles by normalized title.
+    published_titles: dict[str, dict[str, Any]] = {}
+    for rec in journal_articles:
+        if normalize_text(rec.get("publication_type")) == "journal-article":
+            key = title_only_fingerprint(rec.get("title"))
+            if key:
+                published_titles[key] = rec
+
+    # Find preprint-type records in journal_articles that match a published title.
+    kept: list[dict[str, Any]] = []
+    for rec in journal_articles:
+        pub_type = normalize_text(rec.get("publication_type"))
+        if pub_type in PREPRINT_SOURCE_TYPES:
+            key = title_only_fingerprint(rec.get("title"))
+            if key and key in published_titles:
+                # Reclassify as preprint and move to under_review_or_in_prep.
+                preprint_rec = copy.deepcopy(rec)
+                preprint_rec["publication_type"] = "preprint"
+                preprint_rec["section"] = "under_review_or_in_prep"
+                published = published_titles[key]
+                preprint_rec["status"] = (
+                    f"superseded by published version"
+                    + (f" (doi:{published['doi']})" if published.get("doi") else "")
+                )
+                under_review.append(prune_record_for_section(preprint_rec))
+                dedup_actions.append(
+                    {
+                        "title": normalize_text(rec.get("title")),
+                        "action": "reclassified as preprint and moved to under_review_or_in_prep",
+                        "superseded_by_doi": normalize_text(published.get("doi")),
+                    }
+                )
+                continue
+        kept.append(rec)
+
+    publications["journal_articles"] = kept
+    publications["under_review_or_in_prep"] = under_review
+    return dedup_actions
+
+
 def sync_publications(
     cv_data: dict[str, Any],
     hal_records: list[dict[str, Any]] | None = None,
@@ -679,21 +751,28 @@ def sync_publications(
         if conflicts:
             report["conflicts"].append({"title": merged_record["title"], "fields": conflicts})
 
+    # Detect and reclassify preprint duplicates of published journal articles.
+    dedup_actions = classify_and_dedup_preprints(publications)
+    report["deduped_preprints"] = dedup_actions
+
     return cv_data, report
 
 
 def render_report(report: dict[str, Any], config: SyncConfig) -> str:
+    deduped = report.get("deduped_preprints") or []
     lines = [
         "# Publication sync report",
         "",
         f"- Mode: `{config.source_mode}`",
         f"- Apply changes: `{str(config.apply_changes).lower()}`",
+        f"- Output file: `{config.output_file}`",
         f"- HAL id: `{config.hal_id or 'n/a'}`",
         f"- ORCID: `{config.orcid or 'n/a'}`",
         f"- Added: `{len(report['added'])}`",
         f"- Updated: `{len(report['updated'])}`",
         f"- Skipped: `{len(report['skipped'])}`",
         f"- Conflicts kept local: `{len(report['conflicts'])}`",
+        f"- Preprints reclassified: `{len(deduped)}`",
         "",
     ]
 
@@ -727,6 +806,22 @@ def render_report(report: dict[str, Any], config: SyncConfig) -> str:
             suffix = f" ({'; '.join(details)})" if details else ""
             lines.append(f"- {title}{suffix}")
         lines.append("")
+
+    lines.append("## Deduped preprints")
+    if not deduped:
+        lines.extend(["- None", ""])
+    else:
+        lines.append(
+            "These records were reclassified as preprints and moved to "
+            "under_review_or_in_prep because a published journal article "
+            "with the same title was found."
+        )
+        lines.append("")
+        for item in deduped:
+            title = normalize_text(item.get("title")) or "(untitled)"
+            doi_info = f" superseded by doi:{item['superseded_by_doi']}" if item.get("superseded_by_doi") else ""
+            lines.append(f"- {title}{doi_info}")
+        lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -754,7 +849,17 @@ def main(argv: list[str] | None = None) -> int:
     report_text = render_report(report, config)
 
     if config.apply_changes:
-        save_yaml(config.cv_file, updated_data)
+        synced_header = (
+            "# ==============================================================================\n"
+            "# cv.synced.yaml — Generated by sync_publications_hal.py\n"
+            "#\n"
+            "# This file is GENERATED. Do not edit it manually.\n"
+            "# Edit data/cv.yaml (the canonical source) instead, then re-run sync.\n"
+            "# ==============================================================================\n"
+        )
+        is_canonical = config.output_file.resolve() == config.cv_file.resolve()
+        header = None if is_canonical else synced_header
+        save_yaml(config.output_file, updated_data, header=header)
         if config.report_file:
             config.report_file.parent.mkdir(parents=True, exist_ok=True)
             config.report_file.write_text(report_text, encoding="utf-8")
