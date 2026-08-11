@@ -47,6 +47,7 @@ from cv_data import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CV_FILE = LEGACY_CV_FILE
 DEFAULT_SYNCED_FILE = DEFAULT_PUBLICATIONS_FILE
+DEFAULT_PUBLICATIONS_OVERRIDES_FILE = REPO_ROOT / "data" / "publications_overrides.yml"
 
 SECTION_FIELDS = {
     "journal_articles": [
@@ -108,14 +109,45 @@ BASE_RECORD_DEFAULTS = {
 
 HAL_TYPE_MAP = {
     "ART": ("journal_articles", "journal-article"),
+    "ARTICLE": ("journal_articles", "journal-article"),
     "COUV": ("book_chapters", "book-chapter"),
-    "COMM": ("journal_articles", "conference-paper"),
-    "OUV": ("journal_articles", "book"),
-    "THESE": ("journal_articles", "thesis"),
-    "UNDEFINED": ("journal_articles", "other"),
-    "PATENT": ("journal_articles", "other"),
-    "REPORT": ("journal_articles", "report"),
+    "CHAP": ("book_chapters", "book-chapter"),
+    "OUV": ("book_chapters", "book"),
+    "COMM": ("under_review_or_in_prep", "conference-paper"),
+    "THESE": ("under_review_or_in_prep", "thesis"),
+    "HDR": ("under_review_or_in_prep", "hdr"),
+    "PATENT": ("under_review_or_in_prep", "patent"),
+    "REPORT": ("under_review_or_in_prep", "report"),
 }
+
+SECTION_BY_PUBLICATION_CATEGORY = {
+    "journal_articles": "journal_articles",
+    "conference_papers": "under_review_or_in_prep",
+    "conference_posters": "under_review_or_in_prep",
+    "theses": "under_review_or_in_prep",
+    "books_or_chapters": "book_chapters",
+    "reports": "under_review_or_in_prep",
+    "patents": "under_review_or_in_prep",
+    "other_publications": "under_review_or_in_prep",
+}
+
+PUBLICATION_TYPE_BY_CATEGORY = {
+    "journal_articles": "journal-article",
+    "conference_papers": "conference-paper",
+    "conference_posters": "conference-poster",
+    "theses": "thesis",
+    "books_or_chapters": "book-chapter",
+    "reports": "report",
+    "patents": "patent",
+    "other_publications": "other",
+}
+
+POSTER_KEYWORDS = (
+    "poster",
+    "affiche",
+    "présentation affichée",
+    "presentation affichee",
+)
 
 ORCID_TYPE_MAP = {
     "journal-article": ("journal_articles", "journal-article"),
@@ -141,6 +173,7 @@ class SyncConfig:
     source_mode: str
     hal_id: str
     orcid: str
+    overrides_file: Path
     apply_changes: bool
     report_file: Path | None
 
@@ -177,6 +210,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--hal-id", help="Explicit HAL author identifier")
     parser.add_argument("--orcid", help="Explicit ORCID identifier")
+    parser.add_argument(
+        "--overrides-file",
+        default=str(DEFAULT_PUBLICATIONS_OVERRIDES_FILE),
+        help=f"Path to classification overrides (default: {DEFAULT_PUBLICATIONS_OVERRIDES_FILE})",
+    )
     parser.add_argument(
         "--report-file",
         help="Optional markdown report path (written only in apply mode)",
@@ -278,6 +316,7 @@ def build_sync_config(args: argparse.Namespace, cv_data: dict[str, Any]) -> Sync
         source_mode=source_mode,
         hal_id=hal_id,
         orcid=orcid,
+        overrides_file=Path(args.overrides_file),
         apply_changes=bool(args.apply),
         report_file=Path(args.report_file) if args.report_file else None,
     )
@@ -295,12 +334,149 @@ def fetch_json(url: str, headers: dict[str, str] | None = None) -> dict[str, Any
 
 
 def map_hal_type(doc_type: str) -> tuple[str, str]:
-    return HAL_TYPE_MAP.get(normalize_text(doc_type).upper(), ("journal_articles", "other"))
+    return HAL_TYPE_MAP.get(normalize_text(doc_type).upper(), ("under_review_or_in_prep", "other"))
 
 
 def map_orcid_type(work_type: str) -> tuple[str, str]:
     key = normalize_text(work_type).lower()
     return ORCID_TYPE_MAP.get(key, ("journal_articles", key or "other"))
+
+
+def has_poster_indicator(*values: Any) -> bool:
+    text = normalize_text(list(values)).lower()
+    return any(keyword in text for keyword in POSTER_KEYWORDS)
+
+
+def map_publication_category(category: str) -> tuple[str, str]:
+    key = normalize_text(category).lower()
+    section = SECTION_BY_PUBLICATION_CATEGORY.get(key)
+    publication_type = PUBLICATION_TYPE_BY_CATEGORY.get(key)
+    if not section or not publication_type:
+        return "", ""
+    return section, publication_type
+
+
+def classify_hal_publication(doc: dict[str, Any]) -> tuple[str, str]:
+    doc_type = normalize_text(doc.get("docType_s") or doc.get("docType")).upper()
+    sub_type = normalize_text(doc.get("subType_s") or doc.get("subType")).lower()
+    conference_title = normalize_text(doc.get("conferenceTitle_s") or doc.get("conferenceTitle"))
+    journal_title = normalize_text(doc.get("journalTitle_s") or doc.get("journalTitle"))
+    communication_type = normalize_text(doc.get("communicationType_s") or doc.get("communicationType")).lower()
+    title_candidates = doc.get("title_s") or []
+    title = normalize_text(title_candidates[0] if isinstance(title_candidates, list) and title_candidates else title_candidates)
+
+    # Explicit HAL document type mapping.
+    if doc_type in {"ART", "ARTICLE"}:
+        return map_publication_category("journal_articles")
+    if doc_type in {"COUV", "CHAP", "OUV", "BOOK", "BOOKCHAPTER"}:
+        section, publication_type = map_hal_type(doc_type)
+        return section, publication_type
+    if doc_type in {"THESE", "THESIS", "HDR", "MEM"}:
+        publication_type = "hdr" if doc_type == "HDR" else "thesis"
+        section, _ = map_publication_category("theses")
+        return section, publication_type
+    if doc_type in {"REPORT", "RAPPORT", "UNPUBLISHED", "WORKINGPAPER", "WORKING-PAPER"}:
+        return map_publication_category("reports")
+    if doc_type in {"PATENT", "PAT", "BREVET"}:
+        return map_publication_category("patents")
+    if doc_type in {"COMM", "COMMUNICATION"}:
+        if has_poster_indicator(sub_type, communication_type, title):
+            return map_publication_category("conference_posters")
+        return map_publication_category("conference_papers")
+
+    # Metadata heuristics for incomplete docType entries.
+    if conference_title:
+        if has_poster_indicator(sub_type, communication_type, title, conference_title):
+            return map_publication_category("conference_posters")
+        return map_publication_category("conference_papers")
+    if journal_title:
+        return map_publication_category("journal_articles")
+    if has_poster_indicator(sub_type, communication_type, title):
+        return map_publication_category("conference_posters")
+
+    # Conservative fallback for unknown/ambiguous entries.
+    return map_publication_category("other_publications")
+
+
+def load_publication_overrides(path: Path) -> tuple[dict[str, str], list[dict[str, str]]]:
+    if not path.exists():
+        return {}, []
+    try:
+        with path.open(encoding="utf-8") as handle:
+            payload = yaml.safe_load(handle)
+    except yaml.YAMLError as exc:
+        return {}, [{"path": str(path), "found": "yaml-error", "message": f"malformed YAML; ignored ({exc})"}]
+    except OSError as exc:
+        return {}, [{"path": str(path), "found": "io-error", "message": f"could not read overrides; ignored ({exc})"}]
+
+    if payload is None:
+        return {}, []
+    if not isinstance(payload, dict):
+        return {}, [{"path": str(path), "found": type(payload).__name__, "message": "expected mapping; ignored"}]
+
+    overrides: dict[str, str] = {}
+    warnings: list[dict[str, str]] = []
+    for raw_key, value in payload.items():
+        key = normalize_text(raw_key).lower()
+        if not key:
+            continue
+        category = normalize_text(value.get("category") if isinstance(value, dict) else value).lower()
+        if not category:
+            continue
+        section, publication_type = map_publication_category(category)
+        if not section or not publication_type:
+            warnings.append(
+                {
+                    "path": f"{path}:{raw_key}",
+                    "found": category,
+                    "message": "unknown override category; ignored",
+                }
+            )
+            continue
+        if key.startswith("doi:"):
+            key = f"doi:{normalize_doi(key[4:])}"
+        overrides[key] = category
+    return overrides, warnings
+
+
+def record_override_keys(record: dict[str, Any]) -> list[str]:
+    keys: list[str] = []
+    hal_id = normalize_text((record.get("source_ids") or {}).get("hal")).lower()
+    if hal_id:
+        keys.append(f"hal:{hal_id}")
+    doi = normalize_doi(record.get("doi"))
+    if doi:
+        keys.append(f"doi:{doi}")
+    return keys
+
+
+def apply_publication_overrides(
+    records: list[dict[str, Any]],
+    overrides: dict[str, str],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    if not overrides:
+        return records, []
+    applied: list[dict[str, str]] = []
+    for record in records:
+        for key in record_override_keys(record):
+            category = overrides.get(key)
+            if not category:
+                continue
+            section, publication_type = map_publication_category(category)
+            if not section or not publication_type:
+                continue
+            record["section"] = section
+            record["publication_type"] = publication_type
+            applied.append(
+                {
+                    "title": normalize_text(record.get("title")),
+                    "key": key,
+                    "category": category,
+                    "section": section,
+                }
+            )
+            break
+    return records, applied
 
 
 def ensure_record_defaults(record: dict[str, Any], section: str) -> dict[str, Any]:
@@ -327,7 +503,7 @@ def ensure_record_defaults(record: dict[str, Any], section: str) -> dict[str, An
 
 
 def normalize_hal_record(doc: dict[str, Any]) -> dict[str, Any]:
-    section, publication_type = map_hal_type(doc.get("docType_s"))
+    section, publication_type = classify_hal_publication(doc)
     title_candidates = doc.get("title_s") or []
     title = normalize_text(title_candidates[0] if isinstance(title_candidates, list) and title_candidates else title_candidates)
     url = normalize_text(doc.get("uri_s") or "")
@@ -395,6 +571,13 @@ def fetch_hal_publications(hal_id: str) -> list[dict[str, Any]]:
             "halId_s",
             "docid",
             "docType_s",
+            "docType",
+            "subType_s",
+            "subType",
+            "communicationType_s",
+            "communicationType",
+            "journalTitle",
+            "conferenceTitle",
             "uri_s",
         ]
     )
@@ -705,6 +888,8 @@ def sync_publications(
     cv_data: dict[str, Any],
     hal_records: list[dict[str, Any]] | None = None,
     orcid_records: list[dict[str, Any]] | None = None,
+    publication_overrides: dict[str, str] | None = None,
+    override_warnings: list[dict[str, str]] | None = None,
     synced_on: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     synced_on = synced_on or date.today().isoformat()
@@ -714,6 +899,7 @@ def sync_publications(
         publications.setdefault(section, [])
 
     upstream_records = merge_external_records((hal_records or []) + (orcid_records or []))
+    upstream_records, applied_overrides = apply_publication_overrides(upstream_records, publication_overrides or {})
     override_keys = manual_override_keys(cv_data)
     existing_records = iter_existing_publications(cv_data, data_warnings=data_warnings)
 
@@ -722,7 +908,14 @@ def sync_publications(
         for key in record_keys(record):
             keyed_existing.setdefault(key, (section, index, record))
 
-    report = {"added": [], "updated": [], "skipped": [], "conflicts": [], "data_warnings": data_warnings}
+    report = {
+        "added": [],
+        "updated": [],
+        "skipped": [],
+        "conflicts": [],
+        "applied_overrides": applied_overrides,
+        "data_warnings": data_warnings + list(override_warnings or []),
+    }
 
     for upstream in upstream_records:
         keyed_existing: dict[str, tuple[str, int, dict[str, Any]]] = {}
@@ -777,6 +970,7 @@ def sync_publications(
 
 def render_report(report: dict[str, Any], config: SyncConfig) -> str:
     deduped = report.get("deduped_preprints") or []
+    applied_overrides = report.get("applied_overrides") or []
     lines = [
         "# Publication sync report",
         "",
@@ -788,6 +982,7 @@ def render_report(report: dict[str, Any], config: SyncConfig) -> str:
         f"- Added: `{len(report['added'])}`",
         f"- Updated: `{len(report['updated'])}`",
         f"- Skipped: `{len(report['skipped'])}`",
+        f"- Classification overrides applied: `{len(applied_overrides)}`",
         f"- Conflicts kept local: `{len(report['conflicts'])}`",
         f"- Preprints reclassified: `{len(deduped)}`",
         "",
@@ -805,6 +1000,7 @@ def render_report(report: dict[str, Any], config: SyncConfig) -> str:
         ("Added", report["added"]),
         ("Updated", report["updated"]),
         ("Skipped", report["skipped"]),
+        ("Classification overrides", applied_overrides),
         ("Conflicts", report["conflicts"]),
     ]:
         lines.append(f"## {heading}")
@@ -867,10 +1063,13 @@ def main(argv: list[str] | None = None) -> int:
         ]
     config = build_sync_config(args, cv_data)
     hal_records, orcid_records = gather_upstream_records(config)
+    publication_overrides, override_warnings = load_publication_overrides(config.overrides_file)
     updated_data, report = sync_publications(
         copy.deepcopy(cv_data),
         hal_records=hal_records,
         orcid_records=orcid_records,
+        publication_overrides=publication_overrides,
+        override_warnings=override_warnings,
     )
     report_text = render_report(report, config)
 

@@ -75,6 +75,30 @@ Manual protection rules:
 - `sync: manual` blocks overwrite of that record
 - `publication_sync.manual_overrides` in `data/cv.base.yaml` protects DOI/title matches
 
+Classification behavior:
+
+- HAL classification checks multiple fields (`docType[_s]`, `subType[_s]`,
+  conference/journal titles, communication metadata) before assigning a
+  publication section/type.
+- Poster-like communications (for example `affiche`, `poster`) are tagged as
+  `conference-poster`.
+- Unknown or ambiguous HAL records are handled conservatively and are not
+  defaulted into `journal_articles`.
+
+Optional classification overrides:
+
+- Use `data/publications_overrides.yml` to force categories by stable id:
+
+```yaml
+hal:hal-01234567:
+  category: conference_posters
+doi:10.1234/example.doi:
+  category: journal_articles
+```
+
+- Overrides are applied after automatic classification.
+- Unknown override categories are ignored and surfaced as warnings.
+
 ## Extract from LaTeX seed
 
 ```bash

@@ -106,6 +106,32 @@ python scripts/migrate_split_data.py \
 - `publication_sync.manual_overrides` in `cv.base.yaml` can additionally protect
   DOI/title matches
 
+## HAL classification and overrides
+
+`scripts/sync_publications_hal.py` now classifies HAL records using multiple HAL
+fields (`docType[_s]`, `subType[_s]`, conference/journal titles, and
+communication hints) with conservative fallback behavior:
+
+- recognized journal articles remain in `publications.journal_articles`
+- recognized book/chapter records go to `publications.book_chapters`
+- communications, posters, theses/HDR, reports, patents, and unknown/ambiguous
+  records are kept out of `journal_articles` and mapped conservatively to
+  `publications.under_review_or_in_prep`
+- poster indicators such as `affiche` and `poster` are tagged as
+  `conference-poster` publication type
+
+To force a classification without changing code, edit
+`data/publications_overrides.yml`:
+
+```yaml
+hal:hal-01234567:
+  category: conference_posters
+doi:10.1234/example.doi:
+  category: journal_articles
+```
+
+Unknown override categories are ignored with a warning.
+
 ## Removed section
 
 The `skills` section has been removed from the data model, template rendering,
