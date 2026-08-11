@@ -448,9 +448,11 @@ def parse_authors_citation(authors_str: str) -> list:
         return []
 
     # Split on ', ' that is followed by an uppercase word (a new surname),
-    # i.e. not just a single-letter initial like 'F.' after a comma.
-    # A surname-start is: capital letter then ≥1 lowercase or hyphen.
-    parts = re.split(r",\s+(?=[A-Z][a-zÀ-ÿ\-])", authors_str)
+    # i.e. not just a single-letter initial like 'F.' or a hyphenated
+    # initial like 'M-C.' after a comma.
+    # A surname-start is: capital letter then ≥1 lowercase letter (no hyphen
+    # immediately after the first capital, so 'M-C.' is kept with its surname).
+    parts = re.split(r",\s+(?=[A-Z][a-zÀ-ÿ])", authors_str)
 
     authors = []
     for part in parts:

@@ -64,8 +64,8 @@ HAL API / ORCID API
           ↓
     [sync_publications_hal.py]
           ↓
-    Merges upstream publication metadata into data/cv.yaml
-    (respects manual entries; local YAML stays canonical)
+    data/cv.synced.yaml  ← merged output (generated, do not edit)
+    data/cv.yaml         ← canonical source, never overwritten automatically
 ```
 
 ---
@@ -268,7 +268,10 @@ Examples:
 ```bash
 python scripts/sync_publications_hal.py --dry-run --source-mode hal_only
 python scripts/sync_publications_hal.py --dry-run --source-mode hal_plus_orcid
+# Apply: writes to data/cv.synced.yaml (does NOT overwrite data/cv.yaml)
 python scripts/sync_publications_hal.py --apply --report-file build/publication-sync-report.md
+# To overwrite the canonical file explicitly:
+python scripts/sync_publications_hal.py --apply --output-file data/cv.yaml
 ```
 
 ---
