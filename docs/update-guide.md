@@ -57,6 +57,11 @@ publication_sync:
 If `--hal-id` is not passed on the command line, the sync script uses
 `personal.id_hal`. If `--orcid` is not passed, it uses `personal.orcid`.
 
+Publication sections under `publications` are expected to be lists
+(`journal_articles`, `book_chapters`, `under_review_or_in_prep`). If a section
+is `null` or another type, sync now auto-recovers by treating it as an empty
+list and reports a warning in the sync output.
+
 ## Publication sync workflow
 
 Preview first:

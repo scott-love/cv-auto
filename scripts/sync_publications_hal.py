@@ -454,12 +454,65 @@ def merge_external_records(records: list[dict[str, Any]]) -> list[dict[str, Any]
     return sorted(merged_records, key=record_sort_key)
 
 
-def iter_existing_publications(cv_data: dict[str, Any]) -> list[tuple[str, int, dict[str, Any]]]:
+def validate_publication_sections(cv_data: dict[str, Any]) -> list[dict[str, str]]:
+    warnings: list[dict[str, str]] = []
+    publications = cv_data.get("publications")
+    if publications is None:
+        publications = {}
+        cv_data["publications"] = publications
+    elif not isinstance(publications, dict):
+        warnings.append(
+            {
+                "path": "publications",
+                "found": type(publications).__name__,
+                "message": "expected mapping; treated as empty mapping",
+            }
+        )
+        publications = {}
+        cv_data["publications"] = publications
+    for section in SECTION_FIELDS:
+        value = publications.get(section)
+        if section in publications and value is None:
+            warnings.append(
+                {
+                    "path": f"publications.{section}",
+                    "found": "null",
+                    "message": "expected list; treated as empty list",
+                }
+            )
+            publications[section] = []
+        elif section in publications and not isinstance(value, list):
+            warnings.append(
+                {
+                    "path": f"publications.{section}",
+                    "found": type(value).__name__,
+                    "message": "expected list; treated as empty list",
+                }
+            )
+            publications[section] = []
+    return warnings
+
+
+def iter_existing_publications(
+    cv_data: dict[str, Any],
+    data_warnings: list[dict[str, str]] | None = None,
+) -> list[tuple[str, int, dict[str, Any]]]:
     publications = cv_data.setdefault("publications", {})
     result = []
     for section in SECTION_FIELDS:
         publications.setdefault(section, [])
-        for index, record in enumerate(publications[section]):
+        section_records = publications.get(section) or []
+        if not isinstance(section_records, list):
+            if data_warnings is not None:
+                data_warnings.append(
+                    {
+                        "path": f"publications.{section}",
+                        "found": type(section_records).__name__,
+                        "message": "expected list; treated as empty list",
+                    }
+                )
+            section_records = []
+        for index, record in enumerate(section_records):
             result.append((section, index, ensure_record_defaults(record, section)))
     return result
 
@@ -573,20 +626,21 @@ def sync_publications(
     synced_on: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     synced_on = synced_on or date.today().isoformat()
+    data_warnings = validate_publication_sections(cv_data)
     publications = cv_data.setdefault("publications", {})
     for section in SECTION_FIELDS:
         publications.setdefault(section, [])
 
     upstream_records = merge_external_records((hal_records or []) + (orcid_records or []))
     override_keys = manual_override_keys(cv_data)
-    existing_records = iter_existing_publications(cv_data)
+    existing_records = iter_existing_publications(cv_data, data_warnings=data_warnings)
 
     keyed_existing: dict[str, tuple[str, int, dict[str, Any]]] = {}
     for section, index, record in existing_records:
         for key in record_keys(record):
             keyed_existing.setdefault(key, (section, index, record))
 
-    report = {"added": [], "updated": [], "skipped": [], "conflicts": []}
+    report = {"added": [], "updated": [], "skipped": [], "conflicts": [], "data_warnings": data_warnings}
 
     for upstream in upstream_records:
         keyed_existing: dict[str, tuple[str, int, dict[str, Any]]] = {}
@@ -642,6 +696,14 @@ def render_report(report: dict[str, Any], config: SyncConfig) -> str:
         f"- Conflicts kept local: `{len(report['conflicts'])}`",
         "",
     ]
+
+    lines.append("## Data warnings")
+    if not report.get("data_warnings"):
+        lines.extend(["- None", ""])
+    else:
+        for warning in report["data_warnings"]:
+            lines.append(f"- {warning['path']}: found `{warning['found']}`; {warning['message']}")
+        lines.append("")
 
     for heading, items in [
         ("Added", report["added"]),

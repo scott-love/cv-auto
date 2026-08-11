@@ -205,6 +205,48 @@ class SyncPublicationsHalTests(unittest.TestCase):
             self.assertIn("- Added: `1`", rendered)
             self.assertIn("Dry run completed: no files were changed.", rendered)
 
+    def test_main_dry_run_handles_malformed_publication_sections(self):
+        cv_data = {
+            "personal": {"id_hal": "scott-love", "orcid": "0000-0001-7416-9210"},
+            "publication_sync": {
+                "source_mode": "hal_plus_orcid",
+                "sources": {"hal": True, "orcid": True},
+                "manual_overrides": [],
+            },
+            "publications": {
+                "journal_articles": None,
+                "book_chapters": "invalid",
+                "under_review_or_in_prep": [],
+            },
+        }
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            cv_file = Path(tmp_dir) / "cv.yaml"
+            cv_file.write_text(yaml.safe_dump(cv_data, sort_keys=False), encoding="utf-8")
+            original = cv_file.read_text(encoding="utf-8")
+
+            output = io.StringIO()
+            with mock.patch.object(sync_publications_hal, "fetch_hal_publications", return_value=[]):
+                with mock.patch.object(sync_publications_hal, "fetch_orcid_publications", return_value=[]):
+                    with redirect_stdout(output):
+                        exit_code = sync_publications_hal.main(
+                            [
+                                "--cv-file",
+                                str(cv_file),
+                                "--dry-run",
+                                "--source-mode",
+                                "hal_plus_orcid",
+                            ]
+                        )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(cv_file.read_text(encoding="utf-8"), original)
+            rendered = output.getvalue()
+            self.assertIn("## Data warnings", rendered)
+            self.assertIn("- publications.journal_articles: found `null`; expected list; treated as empty list", rendered)
+            self.assertIn("- publications.book_chapters: found `str`; expected list; treated as empty list", rendered)
+            self.assertIn("Dry run completed: no files were changed.", rendered)
+
 
 if __name__ == "__main__":
     unittest.main()
