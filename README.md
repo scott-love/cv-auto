@@ -169,6 +169,10 @@ publications:
       # ...
 ```
 
+Publication subsections are expected to be lists. If a subsection is `null` or
+another type, `scripts/sync_publications_hal.py` now auto-recovers by treating
+it as empty and printing a deterministic data warning in the sync report.
+
 ### Sync Markers
 
 - **`sync: auto`** — Entry may be updated by sync scripts. Use this for citations fetched from APIs.
